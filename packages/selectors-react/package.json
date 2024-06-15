@@ -1,0 +1,11 @@
+{
+  "name": "@state-utils/selectors-react",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "jest ./src",
+    "lint": "eslint ./src"
+  },
+  "peerDependencies": {
+    "react": "^18"
+  }
+}

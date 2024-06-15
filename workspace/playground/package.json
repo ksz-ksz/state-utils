@@ -1,0 +1,12 @@
+{
+  "name": "@workspace/playground",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/index.tsx --bundle --outdir=./dist --minify",
+    "serve": "esbuild src/index.tsx --bundle --outdir=./dist --watch --sourcemap --servedir=."
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

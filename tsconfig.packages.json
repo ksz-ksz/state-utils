@@ -1,0 +1,11 @@
+{
+  "references": [
+    {
+      "path": "./packages/selectors/tsconfig.lib.json"
+    },
+    {
+      "path": "./packages/selectors-react/tsconfig.lib.json"
+    }
+  ],
+  "files": []
+}

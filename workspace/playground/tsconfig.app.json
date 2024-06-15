@@ -1,0 +1,11 @@
+{
+  "extends": "@workspace/tsconfig/app",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
+}

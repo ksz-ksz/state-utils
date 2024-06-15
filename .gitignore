@@ -4,3 +4,4 @@
 *.iml
 .npmrc
 **/.env
+**/*.tsbuildinfo

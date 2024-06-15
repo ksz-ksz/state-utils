@@ -2,8 +2,15 @@
   "name": "@state-utils/selectors",
   "version": "0.0.1",
   "scripts": {
-    "build": "rimraf dist && build-lib && tsc -p tsconfig.lib.json --declaration --emitDeclarationOnly --declarationDir dist/types",
     "test": "jest ./src",
     "lint": "eslint ./src"
+  },
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
   }
 }
