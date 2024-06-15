@@ -1,0 +1,21 @@
+{
+  "name": "state-utils",
+  "workspaces": [
+    "packages/*",
+    "workspace/*"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.2",
+    "@workspace/eslint": "^0.0.0",
+    "@workspace/jest": "^0.0.0",
+    "@workspace/scripts": "^0.0.0",
+    "@workspace/tsconfig": "^0.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.2",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.4.5"
+  }
+}

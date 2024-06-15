@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "exports": {
+    "./lib": "./tsconfig.lib.json",
+    "./app": "./tsconfig.app.json",
+    "./spec": "./tsconfig.spec.json"
+  },
+  "dependencies": {
+  }
+}

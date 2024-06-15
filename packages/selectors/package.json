@@ -1,0 +1,9 @@
+{
+  "name": "@state-utils/selectors",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "rimraf dist && build-lib && tsc -p tsconfig.lib.json --declaration --emitDeclarationOnly --declarationDir dist/types",
+    "test": "jest ./src",
+    "lint": "eslint ./src"
+  }
+}

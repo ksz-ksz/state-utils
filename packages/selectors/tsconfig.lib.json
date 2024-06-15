@@ -1,0 +1,13 @@
+{
+  "extends": "@workspace/tsconfig/lib",
+  "compilerOptions": {
+    "paths": {
+    }
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "**/*"
+  ]
+}
