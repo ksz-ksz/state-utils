@@ -1,6 +1,9 @@
 {
   "references": [
     {
+      "path": "./packages/containers/tsconfig.lib.json"
+    },
+    {
       "path": "./packages/selectors/tsconfig.lib.json"
     },
     {
