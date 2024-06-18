@@ -1,0 +1,19 @@
+{
+  "name": "@state-utils/actions",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "jest ./src",
+    "lint": "eslint ./src"
+  },
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  }
+}

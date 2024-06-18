@@ -1,6 +1,9 @@
 {
   "references": [
     {
+      "path": "./packages/actions/tsconfig.lib.json"
+    },
+    {
       "path": "./packages/containers/tsconfig.lib.json"
     },
     {
@@ -8,6 +11,9 @@
     },
     {
       "path": "./packages/selectors-react/tsconfig.lib.json"
+    },
+    {
+      "path": "./packages/stores/tsconfig.lib.json"
     }
   ],
   "files": []
