@@ -14,6 +14,8 @@
     }
   },
   "dependencies": {
+    "@state-utils/actions": "^0.0.1",
+    "@state-utils/selectors": "^0.0.1",
     "immer": "^10.1.1",
     "rxjs": "^7.8.1"
   }
