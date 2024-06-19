@@ -5,6 +5,7 @@ import {
 } from './store-action-types';
 import { ActionSource, ActionSources, ActionType } from '@state-utils/actions';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { StoreRef, storeRefSymbol } from './store-ref';
 
 export interface StoreTransition<TState, TPayload> {
   (state: TState, payload: TPayload): TState;
@@ -15,13 +16,14 @@ export type StoreTransitions<TState, TPayloads> = {
 };
 
 export interface StoreDef<TState, TPayloads> {
+  ref?: symbol;
   name?: string;
   state: TState;
   actions: StoreActionTypes<TState, TPayloads>;
   transitions: StoreTransitions<TState, TPayloads>;
 }
 
-export interface Store<TState> {
+export interface Store<TState> extends StoreRef<TState> {
   getState(): TState;
   getStateObservable(): Observable<TState>;
   dispose(): void;
@@ -47,7 +49,13 @@ export function createStore<TState, TPayloads>(
   actionSources: ActionSources,
   storeDef: StoreDef<TState, TPayloads>
 ): Store<TState> {
-  const { state, actions, transitions } = storeDef;
+  const {
+    name,
+    ref = name !== undefined ? Symbol(name) : Symbol(),
+    state,
+    actions,
+    transitions,
+  } = storeDef;
 
   const stateSubject = new BehaviorSubject(state);
   const stateObservable = stateSubject.asObservable();
@@ -99,6 +107,7 @@ export function createStore<TState, TPayloads>(
   }
 
   return {
+    [storeRefSymbol]: ref,
     getState(): TState {
       return stateSubject.getValue();
     },
