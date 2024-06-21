@@ -16,7 +16,6 @@ export type StoreTransitions<TState, TPayloads> = {
 };
 
 export interface StoreDef<TState, TPayloads> {
-  ref?: symbol;
   name?: string;
   state: TState;
   actions: StoreActionTypes<TState, TPayloads>;
@@ -47,15 +46,10 @@ function getAfterEventName(name: string) {
 
 export function createStore<TState, TPayloads>(
   actionSources: ActionSources,
-  storeDef: StoreDef<TState, TPayloads>
+  storeDef: StoreDef<TState, TPayloads>,
+  storeRef: symbol = Symbol()
 ): Store<TState> {
-  const {
-    name,
-    ref = name !== undefined ? Symbol(name) : Symbol(),
-    state,
-    actions,
-    transitions,
-  } = storeDef;
+  const { state, actions, transitions } = storeDef;
 
   const stateSubject = new BehaviorSubject(state);
   const stateObservable = stateSubject.asObservable();
@@ -107,7 +101,7 @@ export function createStore<TState, TPayloads>(
   }
 
   return {
-    [storeRefSymbol]: ref,
+    [storeRefSymbol]: storeRef,
     getState(): TState {
       return stateSubject.getValue();
     },
