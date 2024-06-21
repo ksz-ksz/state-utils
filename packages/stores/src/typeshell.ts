@@ -1,37 +1,36 @@
 import { SelectorContext } from '@state-utils/selectors';
 
+declare const storeRefSymbol: unique symbol;
 declare const storeRefState: unique symbol;
 
-interface StoreRef<TState> {
+interface StoreRef<TSymbol extends symbol, TState> {
+  [storeRefSymbol]: TSymbol;
   [storeRefState]?: TState;
 }
 
-declare const storeEntryState: unique symbol;
-
-interface StoreEntry<TState> {
-  [storeEntryState]?: TState;
-  get(ref: StoreRef<TState>): TState;
-}
+type StoreEntry<TSymbol extends symbol, TState> = {
+  [K in TSymbol]: TState;
+};
 
 declare const x: unique symbol;
 
-interface StoreSelectorContext<TDepStates> {
-  [x]?: TDepStates;
+interface StoreSelectorContext<TStoreEntries> {
+  [x]?: TStoreEntries;
 }
 
-interface StoreSelector<TDepStates, TResult> {
-  (state: StoreSelectorContext<TDepStates>): TResult;
-  deps: TDepStates[];
+interface StoreSelector<TStoreEntries, TResult> {
+  (state: StoreSelectorContext<TStoreEntries>): TResult;
+  deps: StoreSelector<any, any>[];
 }
 
-function createStoreStateSelector<TState, TResult>(
-  run: (state: StoreEntry<TState>) => TResult
-): StoreSelector<TState, TResult> {
+function createStoreStateSelector<TSymbol extends symbol, TState>(
+  ref: StoreRef<TSymbol, TState>
+): StoreSelector<StoreEntry<TSymbol, TState>, TState> {
   return undefined as any;
 }
 
-type MapStoreSelectors<TStates> = {
-  [K in keyof TStates]: StoreSelector<TStates[K], any>;
+type MapStoreSelectors<TStoreEntries> = {
+  [K in keyof TStoreEntries]: StoreSelector<TStoreEntries[K], any>;
 };
 
 type Intersect<T> = T extends [infer U]
@@ -40,10 +39,10 @@ type Intersect<T> = T extends [infer U]
     ? U & Intersect<Rest>
     : unknown;
 
-function createStoreSelector<TDepStates, TResult>(
-  deps: MapStoreSelectors<TDepStates>,
-  run: (context: StoreSelectorContext<Intersect<TDepStates>>) => TResult
-): StoreSelector<Intersect<TDepStates>, TResult> {
+function createStoreSelector<TStoreEntries, TResult>(
+  deps: MapStoreSelectors<TStoreEntries>,
+  run: (context: StoreSelectorContext<Intersect<TStoreEntries>>) => TResult
+): StoreSelector<Intersect<TStoreEntries>, TResult> {
   return undefined as any;
 }
 
@@ -59,15 +58,13 @@ interface Bar {
   };
 }
 
-const fooStoreRef: StoreRef<Foo> = undefined as any;
-const barStoreRef: StoreRef<Bar> = undefined as any;
+const fooSymbol = Symbol('foo');
+const barSymbol = Symbol('bar');
+const fooStoreRef: StoreRef<typeof fooSymbol, Foo> = undefined as any;
+const barStoreRef: StoreRef<typeof barSymbol, Bar> = undefined as any;
 
-const selectFoo = createStoreStateSelector((state: StoreEntry<Foo>) =>
-  state.get(fooStoreRef)
-);
-const selectBar = createStoreStateSelector((state: StoreEntry<Bar>) =>
-  state.get(barStoreRef)
-);
+const selectFoo = createStoreStateSelector(fooStoreRef);
+const selectBar = createStoreStateSelector(barStoreRef);
 
 const selectSuccess = createStoreSelector([selectFoo, selectBar], (ctx) => {
   return {
