@@ -1,6 +1,9 @@
 import {
+  createSelector,
+  createStateSelector,
   SelectorContext,
   SelectorMetadata,
+  SelectorOptions,
   StateSelectorMetadata,
 } from '@state-utils/selectors';
 
@@ -47,7 +50,15 @@ function createStoreStateSelector<
   ref: StoreRef<TSymbol, TState>,
   run?: (state: TState, ...args: TArgs) => TResult
 ): StoreStateSelector<StoreEntry<TSymbol, TState>, TResult, TArgs> {
-  return undefined as any;
+  const _run =
+    run !== undefined
+      ? (storeEntries: StoreEntry<TSymbol, TState>, ...args: TArgs) =>
+          run(storeEntries[ref[storeRefSymbol]], ...args)
+      : (storeEntries: StoreEntry<TSymbol, TState>) =>
+          storeEntries[ref[storeRefSymbol]];
+
+  // @ts-expect-error unsafe cast of _run
+  return Object.assign(createStateSelector(_run), { deps: [ref] });
 }
 
 type MapStoreSelectors<TStoreEntries> = {
@@ -64,14 +75,33 @@ type Intersect<T> = T extends [infer U]
     ? U & Intersect<Rest>
     : unknown;
 
-function createStoreSelector<TStoreEntries, TResult, TArgs extends any[]>(
+function createStoreSelector<
+  TStoreEntries extends any[],
+  TResult,
+  TArgs extends any[],
+>(
   deps: MapStoreSelectors<TStoreEntries>,
   run: (
     context: StoreSelectorContext<Intersect<TStoreEntries>>,
     ...args: TArgs
-  ) => TResult
+  ) => TResult,
+  options?: SelectorOptions
 ): StoreSelector<Intersect<TStoreEntries>, TResult, TArgs> {
-  return undefined as any;
+  return Object.assign(createSelector(run, options), {
+    deps: collectDeps(deps),
+  }) as StoreSelector<Intersect<TStoreEntries>, TResult, TArgs>;
+}
+
+function collectDeps(
+  selectors: AnyStoreSelector<unknown, unknown, unknown[]>[]
+) {
+  const deps = new Set<StoreRef<symbol, unknown>>();
+  for (const selector of selectors) {
+    for (const dep of selector.deps) {
+      deps.add(dep);
+    }
+  }
+  return Array.from(deps);
 }
 
 interface Foo {
