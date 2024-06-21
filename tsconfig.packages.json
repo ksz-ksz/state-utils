@@ -7,6 +7,9 @@
       "path": "./packages/containers/tsconfig.lib.json"
     },
     {
+      "path": "./packages/effects/tsconfig.lib.json"
+    },
+    {
       "path": "./packages/selectors/tsconfig.lib.json"
     },
     {
