@@ -1,8 +1,7 @@
-export const storeRefSymbol = Symbol.for('storeRef');
+export const storeRefSymbol = Symbol('storeRefSymbol');
+declare const storeRefState: unique symbol;
 
-export interface StoreRef<TState> {
-  __state?: TState;
-  [storeRefSymbol]: any;
+export interface StoreRef<TSymbol extends symbol, TState> {
+  [storeRefSymbol]: TSymbol;
+  [storeRefState]?: TState;
 }
-
-// export type StoreRef<TState> = Store<TState>;

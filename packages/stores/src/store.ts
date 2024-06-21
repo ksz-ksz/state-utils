@@ -23,7 +23,7 @@ export interface StoreDef<TState, TPayloads> {
   transitions: StoreTransitions<TState, TPayloads>;
 }
 
-export interface Store<TState> extends StoreRef<TState> {
+export interface Store<TState> extends StoreRef<symbol, TState> {
   getState(): TState;
   getStateObservable(): Observable<TState>;
   dispose(): void;
