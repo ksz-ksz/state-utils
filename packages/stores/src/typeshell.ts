@@ -1,3 +1,9 @@
+import {
+  SelectorContext,
+  SelectorMetadata,
+  StateSelectorMetadata,
+} from '@state-utils/selectors';
+
 declare const storeRefSymbol: unique symbol;
 declare const storeRefState: unique symbol;
 
@@ -10,19 +16,21 @@ type StoreEntry<TSymbol extends symbol, TState> = {
   [K in TSymbol]: TState;
 };
 
-declare const x: unique symbol;
+declare const storeSelectorEntries: unique symbol;
 
-interface StoreSelectorContext<TStoreEntries> {
-  [x]?: TStoreEntries;
+interface StoreSelectorContext<TStoreEntries> extends SelectorContext<unknown> {
+  [storeSelectorEntries]?: TStoreEntries;
 }
 
 interface StoreSelector<TStoreEntries, TResult, TArgs extends any[]> {
   (state: StoreSelectorContext<TStoreEntries>, ...args: TArgs): TResult;
+  meta: SelectorMetadata<TStoreEntries, TResult, TArgs>;
   deps: StoreRef<symbol, unknown>[];
 }
 
 interface StoreStateSelector<TStoreEntries, TResult, TArgs extends any[]> {
   (state: StoreSelectorContext<TStoreEntries>, ...args: TArgs): TResult;
+  meta: StateSelectorMetadata<TStoreEntries, TResult, TArgs>;
   deps: StoreRef<symbol, unknown>[];
 }
 
@@ -103,3 +111,5 @@ const selectFail = createStoreSelector([selectFoo], (ctx) => {
     bar: selectBar(ctx, true)?.ugabuga, // <-- should fail
   };
 });
+
+console.log(selectSuccess, selectFail);
