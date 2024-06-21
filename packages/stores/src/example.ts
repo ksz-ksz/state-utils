@@ -5,9 +5,7 @@ import { createActionSources } from '@state-utils/actions';
 import {
   createStoreSelector,
   createStoreStateSelector,
-  StoreSelectorContext,
 } from './store-selector';
-import { StoreRef } from './store-ref';
 
 const actionSources = createActionSources();
 
@@ -88,21 +86,25 @@ const selectTime = createStoreStateSelector(timeStore);
 
 const selectCount = createStoreStateSelector(countStore);
 
-const selectSuccess = createStoreSelector([selectTodos, selectCount], (ctx) => {
-  const todos = selectTodos(ctx);
-  const count = selectCount(ctx);
-  return {
-    todos,
-    count,
-  };
-});
-
-const successSelector2 = createStoreSelector(
-  [selectSuccess, selectTime],
+const selectTodosAndCount = createStoreSelector(
+  [selectTodos, selectCount],
   (ctx) => {
     const todos = selectTodos(ctx);
     const count = selectCount(ctx);
-    const success = selectSuccess(ctx);
+    return {
+      todos,
+      count,
+    };
+  }
+);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const selectSuccess = createStoreSelector(
+  [selectTodosAndCount, selectTime],
+  (ctx) => {
+    const todos = selectTodos(ctx);
+    const count = selectCount(ctx);
+    const success = selectTodosAndCount(ctx);
     const time = selectTime(ctx);
     return {
       todos,
@@ -113,8 +115,10 @@ const successSelector2 = createStoreSelector(
   }
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const selectFailure = createStoreSelector([selectTodos], (ctx) => {
   const todos = selectTodos(ctx);
+  // @ts-expect-error expect ctx not being assignable
   const count = selectCount(ctx);
   return {
     todos,
