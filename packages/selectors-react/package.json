@@ -2,7 +2,7 @@
   "name": "@state-utils/selectors-react",
   "version": "0.0.1",
   "scripts": {
-    "test": "jest ./src",
+    "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest ./src",
     "lint": "eslint ./src"
   },
   "peerDependencies": {

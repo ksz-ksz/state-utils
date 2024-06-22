@@ -45,7 +45,22 @@ describe('Effect', () => {
     fooSubject.next('foo');
     fooSubject.next('bar');
 
-    expect(listing).toMatchInlineSnapshot();
+    expect(listing).toMatchInlineSnapshot(`
+[
+  "next",
+  {
+    "name": "foo",
+    "namespace": "test",
+    "payload": "foo",
+  },
+  "next",
+  {
+    "name": "foo",
+    "namespace": "test",
+    "payload": "bar",
+  },
+]
+`);
   });
 
   it('should stop dispatching actions after dispose', () => {});

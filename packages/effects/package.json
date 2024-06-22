@@ -2,7 +2,7 @@
   "name": "@state-utils/effects",
   "version": "0.0.1",
   "scripts": {
-    "test": "jest ./src",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js ./src",
     "lint": "eslint ./src"
   },
   "types": "./dist/types/index.d.ts",
