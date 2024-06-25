@@ -1,4 +1,4 @@
-interface HistoryController {}
+interface Historian {}
 
 interface Encoder<TEncoded, TDecoded> {
   encode(value: TDecoded): TEncoded;
@@ -29,9 +29,6 @@ interface Route<
 }
 
 interface Routing<
-  // TPath,
-  // TQuery,
-  // TFragment,
   TEncodedPath,
   TEncodedQuery,
   TEncodedFragment,
@@ -76,7 +73,7 @@ function createRouting<
   TQueryFn extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
   TFragmentFn extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
 >(options: {
-  history: HistoryController;
+  historian: Historian;
   pathEncoder: Encoder<string, TEncodedPath>;
   queryEncoder: Encoder<string, TEncodedQuery>;
   fragmentEncoder: Encoder<string, TEncodedFragment>;
@@ -95,7 +92,7 @@ function createRouting<
   return options;
 }
 
-function createBrowserHistory(): HistoryController {
+function createBrowserHistorian(): Historian {
   // @ts-expect-error fixme
   return undefined;
 }
@@ -121,9 +118,13 @@ function createPathEncoder(): Encoder<string, Path> {
   return undefined;
 }
 
+interface QueryEntry {
+  key: string;
+  value: string;
+}
+
 interface Query {
-  get(key: string): string;
-  set(key: string, value: string): void;
+  entries: QueryEntry[];
 }
 
 function createQueryEncoder(): Encoder<string, Query> {
@@ -194,60 +195,63 @@ function fragmentFn<TParam>(): () => Encoder<Fragment, TParam> {
   return undefined as any;
 }
 
-interface Location {
-  path: string;
-  query: string;
-  fragment: string;
+interface Place<TPath, TQuery, TFragment> {
+  path: TPath;
+  query: TQuery;
+  fragment: TFragment;
 }
 
-function createLocation<TPath extends object, TQuery, TFragment>(
-  route: Route<TPath, TQuery, TFragment>,
+function createPlace<
+  TPath extends object,
+  TQuery,
+  TFragment,
+  TEncodedPath,
+  TEncodedQuery,
+  TEncodedFragment,
+>(
+  route: Route<
+    TPath,
+    TQuery,
+    TFragment,
+    TEncodedPath,
+    TEncodedQuery,
+    TEncodedFragment
+  >,
   options: {
     path: TPath;
     query?: TQuery;
     fragment?: TFragment;
   }
-): Location;
-function createLocation<TPath extends never, TQuery, TFragment>(
+): Place<TEncodedPath, TEncodedQuery, TEncodedFragment>;
+function createPlace<
+  TPath extends never,
+  TQuery,
+  TFragment,
+  TEncodedPath,
+  TEncodedQuery,
+  TEncodedFragment,
+>(
   route: Route<TPath, TQuery, TFragment>,
   options?: {
     path?: TPath;
     query?: TQuery;
     fragment?: TFragment;
   }
-): Location;
-function createLocation(
+): Place<TEncodedPath, TEncodedQuery, TEncodedFragment>;
+function createPlace(
   route: Route<unknown, unknown, unknown>,
   options?: {
     path?: unknown;
     query?: unknown;
     fragment?: unknown;
   }
-): Location {
+): Place<unknown, unknown, unknown> {
   // @ts-expect-error fixme
   return [route, options];
 }
 
-// function createLocation<TPath, TQuery, TFragment>(
-//   route: Route<TPath, TQuery, TFragment>,
-//   options: TPath extends object
-//     ? {
-//         path: TPath;
-//         query?: TQuery;
-//         fragment?: TFragment;
-//       }
-//     : {
-//         path?: TPath;
-//         query?: TQuery;
-//         fragment?: TFragment;
-//       }
-// ): Location {
-//   // @ts-expect-error fixme
-//   return [route, options];
-// }
-
 const routing = createRouting({
-  history: createBrowserHistory(),
+  historian: createBrowserHistorian(),
   pathEncoder: createPathEncoder(),
   queryEncoder: createQueryEncoder(),
   fragmentEncoder: createFragmentEncoder(),
@@ -314,22 +318,22 @@ const entityDetailsRoute = routing.createRoute({
 
 const baseRoute = routing.createRoute({});
 
-createLocation(baseRoute);
-createLocation(baseRoute, {});
-createLocation(baseRoute, {
+createPlace(baseRoute);
+createPlace(baseRoute, {});
+createPlace(baseRoute, {
   path: {
     x: 1,
   },
 });
 
 // @ts-expect-error options must be provided
-createLocation(entityRoute);
+createPlace(entityRoute);
 
 // @ts-expect-error options.path must be provided
-createLocation(entityRoute, {});
+createPlace(entityRoute, {});
 
 // @ts-expect-error options.path.x is unknown
-createLocation(entityRoute, {
+createPlace(entityRoute, {
   path: {
     x: 1,
     pathParamBase: 1,
@@ -337,7 +341,7 @@ createLocation(entityRoute, {
 });
 
 // @ts-expect-error options.path.x is unknown
-createLocation(entityDetailsRoute, {
+createPlace(entityDetailsRoute, {
   path: {
     x: 1,
     pathParamBase: 1,
@@ -345,7 +349,7 @@ createLocation(entityDetailsRoute, {
   },
 });
 
-createLocation(entityRoute, {
+createPlace(entityRoute, {
   path: {
     pathParamBase: 1,
   },
@@ -354,7 +358,7 @@ createLocation(entityRoute, {
   },
 });
 
-createLocation(entityDetailsRoute, {
+createPlace(entityDetailsRoute, {
   path: {
     pathParamBase: 1,
     entityId: '2',
