@@ -1,7 +1,5 @@
 interface HistoryController {}
 
-interface Matcher<T> {}
-
 interface Encoder<TEncoded, TDecoded> {
   encode(value: TDecoded): TEncoded;
   decode(value: TEncoded): TDecoded;
@@ -30,6 +28,8 @@ interface Route<
   readonly fragmentEncoder: Encoder<TEncodedFragment, TFragment> | undefined;
 }
 
+type Alt<T, U> = T extends unknown ? U : T;
+
 interface Routing<
   // TPath,
   // TQuery,
@@ -49,18 +49,25 @@ interface Routing<
   fragmentEncoder: Encoder<string, TEncodedFragment>;
 
   createRoute: <
-    TPath,
-    TQuery,
-    TFragment,
     TParentPath = unknown,
     TParentQuery = unknown,
     TParentFragment = unknown,
+    TPath = TParentPath,
+    TQuery = TParentQuery,
+    TFragment = TParentFragment,
   >(options: {
     parent?: Route<TParentPath, TParentQuery, TParentFragment>;
     path?: EncoderFactory<TEncodedPath, TPath, TParentPath>;
     query?: EncoderFactory<TEncodedQuery, TQuery, TParentFragment>;
     fragment?: EncoderFactory<TEncodedFragment, TFragment, TParentFragment>;
-  }) => Route<TPath, TQuery, TFragment>;
+  }) => Route<
+    TPath,
+    TQuery,
+    TFragment,
+    TEncodedPath,
+    TEncodedQuery,
+    TEncodedFragment
+  >;
 }
 
 function createRouting<
@@ -87,7 +94,7 @@ function createRouting<
   TFragmentFn
 > {
   // @ts-expect-error fixme
-  return undefined;
+  return options;
 }
 
 function createBrowserHistory(): HistoryController {
@@ -138,7 +145,8 @@ function pathFn<TParams, TParentParams>(options?: {
 }): (
   parent: Encoder<Path, TParentParams>
 ) => Encoder<Path, TParentParams & TParams> {
-  return undefined as any;
+  // @ts-expect-error fixme
+  return options;
 }
 
 function queryFn<TParams, TParentParams>(options?: {
@@ -146,7 +154,8 @@ function queryFn<TParams, TParentParams>(options?: {
 }): (
   parent: Encoder<Query, TParentParams>
 ) => Encoder<Query, Partial<TParentParams & TParams>> {
-  return undefined as any;
+  // @ts-expect-error fixme
+  return options;
 }
 
 function fragmentFn<TParam>(): () => Encoder<Fragment, TParam> {
@@ -176,6 +185,7 @@ const rootRoute = routing.createRoute({
       bar: 'str',
     },
   }),
+  fragment: routing.fragment(),
 });
 
 const entityRoute = routing.createRoute({
