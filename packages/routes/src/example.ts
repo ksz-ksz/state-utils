@@ -28,8 +28,6 @@ interface Route<
   readonly fragmentEncoder: Encoder<TEncodedFragment, TFragment> | undefined;
 }
 
-type Alt<T, U> = T extends unknown ? U : T;
-
 interface Routing<
   // TPath,
   // TQuery,
@@ -49,16 +47,16 @@ interface Routing<
   fragmentEncoder: Encoder<string, TEncodedFragment>;
 
   createRoute: <
-    TParentPath = unknown,
-    TParentQuery = unknown,
-    TParentFragment = unknown,
+    TParentPath = never,
+    TParentQuery = never,
+    TParentFragment = never,
     TPath = TParentPath,
     TQuery = TParentQuery,
     TFragment = TParentFragment,
   >(options: {
     parent?: Route<TParentPath, TParentQuery, TParentFragment>;
     path?: EncoderFactory<TEncodedPath, TPath, TParentPath>;
-    query?: EncoderFactory<TEncodedQuery, TQuery, TParentFragment>;
+    query?: EncoderFactory<TEncodedQuery, TQuery, TParentQuery>;
     fragment?: EncoderFactory<TEncodedFragment, TFragment, TParentFragment>;
   }) => Route<
     TPath,
@@ -155,7 +153,11 @@ type InferParamNames<TPath extends string> = InferParamName<
 >;
 
 type PathParams<TPath extends string> = {
-  [name in InferParamNames<TPath>]: unknown;
+  [K in InferParamNames<TPath>]: unknown;
+};
+
+type MapEncoders<TParams> = {
+  [K in keyof TParams]: Encoder<TParams[K], unknown>;
 };
 
 function pathFn<
@@ -163,14 +165,14 @@ function pathFn<
   TParams extends PathParams<TPath>,
   TParentParams,
 >(
-  options: object extends PathParams<TPath>
+  options: object extends TParams
     ? {
         path: TPath;
-        params?: TParams;
+        params?: MapEncoders<TParams>;
       }
     : {
         path: TPath;
-        params: TParams;
+        params: MapEncoders<TParams>;
       }
 ): (
   parent: Encoder<Path, TParentParams>
@@ -180,7 +182,7 @@ function pathFn<
 }
 
 function queryFn<TParams, TParentParams>(options?: {
-  params?: TParams;
+  params?: MapEncoders<TParams>;
 }): (
   parent: Encoder<Query, TParentParams>
 ) => Encoder<Query, Partial<TParentParams & TParams>> {
@@ -192,6 +194,58 @@ function fragmentFn<TParam>(): () => Encoder<Fragment, TParam> {
   return undefined as any;
 }
 
+interface Location {
+  path: string;
+  query: string;
+  fragment: string;
+}
+
+function createLocation<TPath extends object, TQuery, TFragment>(
+  route: Route<TPath, TQuery, TFragment>,
+  options: {
+    path: TPath;
+    query?: TQuery;
+    fragment?: TFragment;
+  }
+): Location;
+function createLocation<TPath extends never, TQuery, TFragment>(
+  route: Route<TPath, TQuery, TFragment>,
+  options?: {
+    path?: TPath;
+    query?: TQuery;
+    fragment?: TFragment;
+  }
+): Location;
+function createLocation(
+  route: Route<unknown, unknown, unknown>,
+  options?: {
+    path?: unknown;
+    query?: unknown;
+    fragment?: unknown;
+  }
+): Location {
+  // @ts-expect-error fixme
+  return [route, options];
+}
+
+// function createLocation<TPath, TQuery, TFragment>(
+//   route: Route<TPath, TQuery, TFragment>,
+//   options: TPath extends object
+//     ? {
+//         path: TPath;
+//         query?: TQuery;
+//         fragment?: TFragment;
+//       }
+//     : {
+//         path?: TPath;
+//         query?: TQuery;
+//         fragment?: TFragment;
+//       }
+// ): Location {
+//   // @ts-expect-error fixme
+//   return [route, options];
+// }
+
 const routing = createRouting({
   history: createBrowserHistory(),
   pathEncoder: createPathEncoder(),
@@ -202,18 +256,36 @@ const routing = createRouting({
   fragmentFn,
 });
 
+const params: {
+  enum<T extends string>(options: { values: T[] }): Encoder<T, string>;
+  string<T extends string>(options?: {
+    pattern?: string | RegExp;
+    minLength?: number;
+    maxLength?: number;
+  }): Encoder<T, string>;
+  number<T extends number>(options?: {
+    integer?: boolean;
+    min?: number;
+    max?: number;
+  }): Encoder<T, string>;
+  boolean<T extends boolean>(options?: {
+    trueValue?: string;
+    falseValue?: string;
+  }): Encoder<T, string>;
+} = undefined as any;
+
 const rootRoute = routing.createRoute({
   path: routing.path({
-    path: ':foo/:bar',
+    path: ':pathParamBase',
     params: {
-      foo: 123,
-      bar: 'str',
+      pathParamBase: params.number(),
     },
   }),
   query: routing.query({
     params: {
-      foo: 123,
-      bar: 'str',
+      queryParamBase: params.enum({
+        values: ['hi', 'hello'],
+      }),
     },
   }),
   fragment: routing.fragment(),
@@ -221,22 +293,75 @@ const rootRoute = routing.createRoute({
 
 const entityRoute = routing.createRoute({
   parent: rootRoute,
-  query: queryFn({
+  query: routing.query({
     params: {
-      baz: false,
+      baz: params.string(),
     },
   }),
 });
 
 const entityDetailsRoute = routing.createRoute({
   parent: entityRoute,
-  path: routing.path(':entityId', {
-    entityId: params.string({
-      regex: /ENTITY-[0-9]{16}/,
-    }),
+  path: routing.path({
+    path: ':entityId',
+    params: {
+      entityId: params.string({
+        pattern: /ENTITY-[0-9]{16}/,
+      }),
+    },
   }),
-  query: {
-    timeframe: params.string(),
-  },
-  fragment: params.string(),
 });
+
+const baseRoute = routing.createRoute({});
+
+createLocation(baseRoute);
+createLocation(baseRoute, {});
+createLocation(baseRoute, {
+  path: {
+    x: 1,
+  },
+});
+
+// @ts-expect-error options must be provided
+createLocation(entityRoute);
+
+// @ts-expect-error options.path must be provided
+createLocation(entityRoute, {});
+
+// @ts-expect-error options.path.x is unknown
+createLocation(entityRoute, {
+  path: {
+    x: 1,
+    pathParamBase: 1,
+  },
+});
+
+// @ts-expect-error options.path.x is unknown
+createLocation(entityDetailsRoute, {
+  path: {
+    x: 1,
+    pathParamBase: 1,
+    entityId: '2',
+  },
+});
+
+createLocation(entityRoute, {
+  path: {
+    pathParamBase: 1,
+  },
+  query: {
+    baz: 'asd',
+  },
+});
+
+createLocation(entityDetailsRoute, {
+  path: {
+    pathParamBase: 1,
+    entityId: '2',
+  },
+  query: {
+    baz: 'asd',
+  },
+});
+
+// type InferPath<T> = T extends Route<infer U, any, any> ? U : never;
