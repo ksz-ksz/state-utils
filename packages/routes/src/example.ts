@@ -140,9 +140,39 @@ function createFragmentEncoder(): Encoder<string, Fragment> {
   return undefined as any;
 }
 
-function pathFn<TParams, TParentParams>(options?: {
-  params?: TParams;
-}): (
+type InferPathSegments<TPath extends string> = TPath extends ''
+  ? never
+  : TPath extends `${infer THead}/${infer TTail}`
+    ? (THead extends '' ? never : THead) | InferPathSegments<TTail>
+    : TPath;
+
+type InferParamName<TPathSegment> = TPathSegment extends `:${infer TParamName}`
+  ? TParamName
+  : never;
+
+type InferParamNames<TPath extends string> = InferParamName<
+  InferPathSegments<TPath>
+>;
+
+type PathParams<TPath extends string> = {
+  [name in InferParamNames<TPath>]: unknown;
+};
+
+function pathFn<
+  TPath extends string,
+  TParams extends PathParams<TPath>,
+  TParentParams,
+>(
+  options: object extends PathParams<TPath>
+    ? {
+        path: TPath;
+        params?: TParams;
+      }
+    : {
+        path: TPath;
+        params: TParams;
+      }
+): (
   parent: Encoder<Path, TParentParams>
 ) => Encoder<Path, TParentParams & TParams> {
   // @ts-expect-error fixme
@@ -174,6 +204,7 @@ const routing = createRouting({
 
 const rootRoute = routing.createRoute({
   path: routing.path({
+    path: ':foo/:bar',
     params: {
       foo: 123,
       bar: 'str',
