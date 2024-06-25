@@ -17,7 +17,7 @@ export type PathParams<TPath extends string> = {
   [K in InferParamNames<TPath>]: unknown;
 };
 
-export function pathFn<
+export function createPathEncoderFactory<
   TPath extends string,
   TParams extends PathParams<TPath>,
   TParentParams,

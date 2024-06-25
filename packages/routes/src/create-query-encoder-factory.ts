@@ -2,7 +2,7 @@ import { MapEncoders } from './map-encoders';
 import { Encoder } from './encoder';
 import { Query } from './query';
 
-export function queryFn<TParams, TParentParams>(options?: {
+export function createQueryEncoderFactory<TParams, TParentParams>(options?: {
   params?: MapEncoders<TParams>;
 }): (
   parent: Encoder<Query, TParentParams>

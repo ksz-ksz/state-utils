@@ -4,9 +4,9 @@ import { createBrowserHistorian } from './browser-historian';
 import { createPathEncoder } from './path';
 import { createQueryEncoder } from './query';
 import { createFragmentEncoder } from './fragment';
-import { pathFn } from './path-fn';
-import { queryFn } from './query-fn';
-import { fragmentFn } from './fragment-fn';
+import { createPathEncoderFactory } from './create-path-encoder-factory';
+import { createQueryEncoderFactory } from './create-query-encoder-factory';
+import { createFragmentEncoderFactory } from './create-fragment-encoder-factory';
 import { createPlace } from './place';
 
 const routing = createRouting({
@@ -14,9 +14,9 @@ const routing = createRouting({
   pathEncoder: createPathEncoder(),
   queryEncoder: createQueryEncoder(),
   fragmentEncoder: createFragmentEncoder(),
-  pathFn,
-  queryFn,
-  fragmentFn,
+  createPathEncoderFactory: createPathEncoderFactory,
+  createQueryEncoderFactory: createQueryEncoderFactory,
+  createFragmentEncoderFactory: createFragmentEncoderFactory,
 });
 
 const params: {

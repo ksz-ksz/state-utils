@@ -8,13 +8,13 @@ export interface Routing<
   TEncodedPath,
   TEncodedQuery,
   TEncodedFragment,
-  TPathFn extends EncoderFactoryFn<TEncodedPath, unknown, unknown>,
-  TQueryFn extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
-  TFragmentFn extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
+  TCreatePath extends EncoderFactoryFn<TEncodedPath, unknown, unknown>,
+  TCreateQuery extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
+  TCreateFragment extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
 > {
-  path: TPathFn;
-  query: TQueryFn;
-  fragment: TFragmentFn;
+  path: TCreatePath;
+  query: TCreateQuery;
+  fragment: TCreateFragment;
   pathEncoder: Encoder<string, TEncodedPath>;
   queryEncoder: Encoder<string, TEncodedQuery>;
   fragmentEncoder: Encoder<string, TEncodedFragment>;
@@ -45,24 +45,24 @@ export function createRouting<
   TEncodedPath,
   TEncodedQuery,
   TEncodedFragment,
-  TPathFn extends EncoderFactoryFn<TEncodedPath, unknown, unknown>,
-  TQueryFn extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
-  TFragmentFn extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
+  TCreatePath extends EncoderFactoryFn<TEncodedPath, unknown, unknown>,
+  TCreateQuery extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
+  TCreateFragment extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
 >(options: {
   historian: Historian;
   pathEncoder: Encoder<string, TEncodedPath>;
   queryEncoder: Encoder<string, TEncodedQuery>;
   fragmentEncoder: Encoder<string, TEncodedFragment>;
-  pathFn: TPathFn;
-  queryFn: TQueryFn;
-  fragmentFn: TFragmentFn;
+  createPathEncoderFactory: TCreatePath;
+  createQueryEncoderFactory: TCreateQuery;
+  createFragmentEncoderFactory: TCreateFragment;
 }): Routing<
   TEncodedPath,
   TEncodedQuery,
   TEncodedFragment,
-  TPathFn,
-  TQueryFn,
-  TFragmentFn
+  TCreatePath,
+  TCreateQuery,
+  TCreateFragment
 > {
   // @ts-expect-error fixme
   return options;
