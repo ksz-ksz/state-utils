@@ -1,4 +1,3 @@
-import { Encoder } from './encoder';
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
 import { createPathEncoder } from './path';
@@ -8,6 +7,7 @@ import { createPathEncoderFactory } from './create-path-encoder-factory';
 import { createQueryEncoderFactory } from './create-query-encoder-factory';
 import { createFragmentEncoderFactory } from './create-fragment-encoder-factory';
 import { createPlace } from './place';
+import { params } from './params';
 
 const routing = createRouting({
   historian: createBrowserHistorian(),
@@ -18,24 +18,6 @@ const routing = createRouting({
   createQueryEncoderFactory: createQueryEncoderFactory,
   createFragmentEncoderFactory: createFragmentEncoderFactory,
 });
-
-const params: {
-  enum<T extends string>(options: { values: T[] }): Encoder<T, string>;
-  string<T extends string>(options?: {
-    pattern?: string | RegExp;
-    minLength?: number;
-    maxLength?: number;
-  }): Encoder<T, string>;
-  number<T extends number>(options?: {
-    integer?: boolean;
-    min?: number;
-    max?: number;
-  }): Encoder<T, string>;
-  boolean<T extends boolean>(options?: {
-    trueValue?: string;
-    falseValue?: string;
-  }): Encoder<T, string>;
-} = undefined as any;
 
 const rootRoute = routing.createRoute({
   path: routing.path({
