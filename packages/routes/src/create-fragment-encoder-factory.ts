@@ -1,9 +1,11 @@
 import { Encoder } from './encoder';
 import { Fragment } from './fragment';
+import { EncoderFactory } from './encoder-factory';
 
-export function createFragmentEncoderFactory<TParam>(): () => Encoder<
+export function createFragmentEncoderFactory<TParam>(): EncoderFactory<
   Fragment,
-  TParam
+  TParam,
+  unknown
 > {
   // @ts-expect-error fixme
   return undefined;

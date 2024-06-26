@@ -1,6 +1,7 @@
 import { Encoder } from './encoder';
 import { Path } from './path';
 import { MapEncoders } from './map-encoders';
+import { EncoderFactory } from './encoder-factory';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
   ? never
@@ -31,9 +32,7 @@ export function createPathEncoderFactory<
         path: TPath;
         params: MapEncoders<TParams>;
       }
-): (
-  parent: Encoder<Path, TParentParams>
-) => Encoder<Path, TParentParams & TParams> {
+): EncoderFactory<Path, TParentParams & TParams, TParentParams> {
   // @ts-expect-error fixme
   return options;
 }
