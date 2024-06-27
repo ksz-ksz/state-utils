@@ -28,9 +28,7 @@ const rootRoute = routing.createRoute({
   }),
   query: routing.query({
     params: {
-      queryParamBase: params.enum({
-        values: ['hi', 'hello'],
-      }),
+      queryParamBase: params.string(),
     },
   }),
   fragment: routing.fragment(),
@@ -105,6 +103,7 @@ createPlace(entityDetailsRoute, {
     entityId: '2',
   },
   query: {
+    queryParamBase: '',
     baz: 'asd',
   },
 });
