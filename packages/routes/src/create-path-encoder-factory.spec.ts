@@ -28,6 +28,7 @@ describe('create-path-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": 2,
+  "parent": undefined,
   "valid": true,
   "value": {
     "foo": "fooVal",
@@ -76,6 +77,14 @@ describe('create-path-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": 4,
+  "parent": {
+    "consumed": 2,
+    "parent": undefined,
+    "valid": false,
+    "value": {
+      "foo": "fooVal",
+    },
+  },
   "valid": true,
   "value": {
     "bar": "barVar",
