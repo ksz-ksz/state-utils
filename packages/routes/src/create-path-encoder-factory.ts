@@ -1,7 +1,11 @@
 import { Path } from './path';
 import { Encoders } from './encoders';
-import { EncoderFactory } from './encoder-factory';
-import { Encoder, Result } from './encoder';
+import { Encoder, EncoderResult } from './encoder';
+import {
+  PathEncoderFactory,
+  PathEncoder as _PathEncoder,
+  PathEncoderResult as _PathEncoderResult,
+} from './routing';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
   ? never
@@ -32,7 +36,7 @@ export function createPathEncoderFactory<
         path: TPath;
         params: Encoders<TParams>;
       }
-): EncoderFactory<Path, TParentParams & TParams, TParentParams> {
+): PathEncoderFactory<Path, TParentParams & TParams, TParentParams> {
   return (parent) => {
     // @ts-expect-error unsafe parent cast
     return new PathEncoder(parent, parsePath(options.path), options.params);
@@ -82,7 +86,7 @@ function parsePath(path: string): PathEncoderSegment[] {
   return parseNormalizedPath(normalizePath(path));
 }
 
-type PathEncoderResult<T> = Result<T> & {
+type PathEncoderResult<T> = _PathEncoderResult<T> & {
   /**
    * - positive integer - a number of successfully consumed path segments
    * - -1 - means that the Path cannot be decoded
@@ -91,7 +95,7 @@ type PathEncoderResult<T> = Result<T> & {
 };
 
 class PathEncoder<TParams, TParentParams>
-  implements Encoder<Path, TParentParams & TParams>
+  implements _PathEncoder<Path, TParentParams & TParams>
 {
   constructor(
     private readonly parent: PathEncoder<TParentParams, unknown> | undefined,
@@ -99,7 +103,7 @@ class PathEncoder<TParams, TParentParams>
     private readonly params: Encoders<TParams>
   ) {}
 
-  encode(value: TParentParams & TParams): Result<Path> {
+  encode(value: TParentParams & TParams): EncoderResult<Path> {
     // @ts-expect-error fixme
     return value;
   }
@@ -117,6 +121,7 @@ class PathEncoder<TParams, TParentParams>
           return {
             valid: false,
             consumed: -1,
+            parent: parentResult,
           };
         }
       } else if (parentResult.consumed !== -1) {
@@ -126,6 +131,7 @@ class PathEncoder<TParams, TParentParams>
           return {
             valid: false,
             consumed: -1,
+            parent: parentResult,
           };
         }
 
@@ -133,12 +139,14 @@ class PathEncoder<TParams, TParentParams>
         return {
           valid: consumed === value.segments.length,
           consumed,
+          parent: parentResult,
           value: { ...parentResult.value, ...params },
         };
       } else {
         return {
           valid: false,
           consumed: parentResult.consumed,
+          parent: parentResult,
         };
       }
     } else {
@@ -147,6 +155,7 @@ class PathEncoder<TParams, TParentParams>
         return {
           valid: false,
           consumed: -1,
+          parent: undefined,
         };
       }
 
@@ -154,6 +163,7 @@ class PathEncoder<TParams, TParentParams>
       return {
         valid: consumed === value.segments.length,
         consumed,
+        parent: undefined,
         value: params,
       };
     }

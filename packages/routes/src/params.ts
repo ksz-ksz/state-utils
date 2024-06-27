@@ -1,4 +1,4 @@
-import { Encoder, Result } from './encoder';
+import { Encoder, EncoderResult } from './encoder';
 
 export interface StringParamOptions {
   pattern?: RegExp;
@@ -36,7 +36,7 @@ export const params: {
 class StringParamEncoder implements Encoder<string, string> {
   constructor(private readonly options: StringParamOptions) {}
 
-  encode(value: string): Result<string> {
+  encode(value: string): EncoderResult<string> {
     if (this.isValid(value)) {
       return {
         valid: true,
@@ -49,7 +49,7 @@ class StringParamEncoder implements Encoder<string, string> {
     }
   }
 
-  decode(value: string): Result<string> {
+  decode(value: string): EncoderResult<string> {
     if (this.isValid(value)) {
       return {
         valid: true,
@@ -81,7 +81,7 @@ class StringParamEncoder implements Encoder<string, string> {
 class NumberParamEncoder implements Encoder<number, string> {
   constructor(private readonly options: NumberParamOptions) {}
 
-  encode(value: string): Result<number> {
+  encode(value: string): EncoderResult<number> {
     const encodedValue = Number(value);
     if (this.isValid(encodedValue)) {
       return {
@@ -95,7 +95,7 @@ class NumberParamEncoder implements Encoder<number, string> {
     }
   }
 
-  decode(value: number): Result<string> {
+  decode(value: number): EncoderResult<string> {
     if (this.isValid(value)) {
       return {
         valid: true,
@@ -131,7 +131,7 @@ class NumberParamEncoder implements Encoder<number, string> {
 class BooleanParamEncoder implements Encoder<boolean, string> {
   constructor(private readonly options: BooleanParamOptions) {}
 
-  encode(value: string): Result<boolean> {
+  encode(value: string): EncoderResult<boolean> {
     const encodedValue = this.parse(value);
     if (encodedValue !== undefined) {
       return {
@@ -145,7 +145,7 @@ class BooleanParamEncoder implements Encoder<boolean, string> {
     }
   }
 
-  decode(value: boolean): Result<string> {
+  decode(value: boolean): EncoderResult<string> {
     const decodedValue = this.format(value);
     return {
       valid: true,
