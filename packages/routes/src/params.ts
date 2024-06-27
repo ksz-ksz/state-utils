@@ -16,4 +16,15 @@ export const params: {
     trueValue?: string;
     falseValue?: string;
   }): Encoder<T, string>;
-} = undefined as any;
+} = {
+  string() {
+    return {
+      decode(value: any) {
+        return {
+          valid: true,
+          value,
+        };
+      },
+    };
+  },
+} as any;

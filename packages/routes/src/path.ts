@@ -2,12 +2,12 @@ import { Encoder } from './encoder';
 
 export interface PathPathSegment {
   type: 'path';
-  literal: string;
+  name: string;
 }
 
 export interface PathParamPathSegment {
   type: 'path-param';
-  param: string;
+  value: string;
 }
 
 export type PathSegment = PathPathSegment | PathParamPathSegment;

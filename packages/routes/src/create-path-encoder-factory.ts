@@ -1,7 +1,7 @@
-import { Encoder } from './encoder';
 import { Path } from './path';
-import { MapEncoders } from './map-encoders';
+import { Encoders } from './encoders';
 import { EncoderFactory } from './encoder-factory';
+import { Encoder, Result } from './encoder';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
   ? never
@@ -26,13 +26,173 @@ export function createPathEncoderFactory<
   options: object extends TParams
     ? {
         path: TPath;
-        params?: MapEncoders<TParams>;
+        params?: Encoders<TParams>;
       }
     : {
         path: TPath;
-        params: MapEncoders<TParams>;
+        params: Encoders<TParams>;
       }
 ): EncoderFactory<Path, TParentParams & TParams, TParentParams> {
-  // @ts-expect-error fixme
-  return options;
+  return (parent) => {
+    // @ts-expect-error unsafe parent cast
+    return new PathEncoder(parent, parsePath(options.path), options.params);
+  };
+}
+
+interface PathPathEncoderSegment {
+  type: 'path';
+  name: string;
+}
+
+interface PathParamEncoderSegment {
+  type: 'path-param';
+  name: string;
+}
+
+type PathEncoderSegment = PathPathEncoderSegment | PathParamEncoderSegment;
+
+function normalizePath(path: string): string {
+  let normalizedPath = path.replaceAll(/\/+/g, '/');
+  if (normalizedPath.startsWith('/')) {
+    normalizedPath = normalizedPath.substring(1);
+  }
+  if (normalizedPath.endsWith('/')) {
+    normalizedPath = normalizedPath.substring(0, -1);
+  }
+  return normalizedPath;
+}
+
+function parseNormalizedPath(path: string): PathEncoderSegment[] {
+  return path.split('/').map((segment): PathEncoderSegment => {
+    if (segment.startsWith(':')) {
+      return {
+        type: 'path-param',
+        name: segment.substring(1),
+      };
+    } else {
+      return {
+        type: 'path',
+        name: segment,
+      };
+    }
+  });
+}
+
+function parsePath(path: string): PathEncoderSegment[] {
+  return parseNormalizedPath(normalizePath(path));
+}
+
+type PathEncoderResult<T> = Result<T> & {
+  /**
+   * - positive integer - a number of successfully consumed path segments
+   * - -1 - means that the Path cannot be decoded
+   */
+  consumed: number;
+};
+
+class PathEncoder<TParams, TParentParams>
+  implements Encoder<Path, TParentParams & TParams>
+{
+  constructor(
+    private readonly parent: PathEncoder<TParentParams, unknown> | undefined,
+    private readonly path: PathEncoderSegment[],
+    private readonly params: Encoders<TParams>
+  ) {}
+
+  encode(value: TParentParams & TParams): Result<Path> {
+    // @ts-expect-error fixme
+    return value;
+  }
+
+  decode(value: Path): PathEncoderResult<TParentParams & TParams> {
+    if (this.parent !== undefined) {
+      const parentResult = this.parent.decode(value);
+      if (parentResult.valid) {
+        // parent consumed all the segments
+        if (this.path.length === 0) {
+          // there are no segments to match against on this level
+          return parentResult as PathEncoderResult<TParentParams & TParams>;
+        } else {
+          // there are still segments to match against on this lever, but there's nothing to consume
+          return {
+            valid: false,
+            consumed: -1,
+          };
+        }
+      } else if (parentResult.consumed !== -1) {
+        // parent did not consume all the segments, but the segments it consumed so far are valid
+        const params = this.matchPath(value, parentResult.consumed);
+        if (params === undefined) {
+          return {
+            valid: false,
+            consumed: -1,
+          };
+        }
+
+        const consumed = parentResult.consumed + this.path.length;
+        return {
+          valid: consumed === value.segments.length,
+          consumed,
+          value: { ...parentResult.value, ...params },
+        };
+      } else {
+        return {
+          valid: false,
+          consumed: parentResult.consumed,
+        };
+      }
+    } else {
+      const params = this.matchPath(value, 0);
+      if (params === undefined) {
+        return {
+          valid: false,
+          consumed: -1,
+        };
+      }
+
+      const consumed = this.path.length;
+      return {
+        valid: consumed === value.segments.length,
+        consumed,
+        value: params,
+      };
+    }
+  }
+
+  private matchPath(path: Path, consumed: number) {
+    const params: any = {};
+    for (let i = 0; i < this.path.length; i++) {
+      const segmentValue = path.segments[consumed + i];
+      if (segmentValue === undefined) {
+        return undefined;
+      }
+      const segment = this.path[i];
+      switch (segment.type) {
+        case 'path':
+          if (
+            segmentValue.type != 'path' ||
+            segmentValue.name !== segment.name
+          ) {
+            return undefined;
+          }
+          break;
+        case 'path-param':
+          if (segmentValue.type !== 'path-param') {
+            return undefined;
+          } else {
+            const paramEncoder = (this.params as any)[segment.name] as Encoder<
+              unknown,
+              unknown
+            >;
+            const paramEncoderResult = paramEncoder.decode(segmentValue);
+            if (!paramEncoderResult.valid) {
+              return undefined;
+            }
+            params[segment.name] = segmentValue.value;
+          }
+          break;
+      }
+    }
+    return params;
+  }
 }
