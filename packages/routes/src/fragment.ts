@@ -1,8 +1,6 @@
 import { Encoder } from './encoder';
 
-export interface Fragment {
-  value: string;
-}
+export type Fragment = string;
 
 export function createFragmentEncoder(): Encoder<string, Fragment> {
   // @ts-expect-error fixme
