@@ -94,4 +94,87 @@ describe('create-path-encoder-factory', () => {
 `);
     });
   });
+
+  describe('encode', () => {
+    it('should encode', () => {
+      const encoderFactory = createPathEncoderFactory({
+        path: 'hello/:foo',
+        params: {
+          foo: params.string(),
+        },
+      });
+      const encoder = encoderFactory();
+
+      const result = encoder.encode({
+        foo: 'fooVal',
+      });
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {
+    "segments": [
+      {
+        "name": "hello",
+        "type": "path",
+      },
+      {
+        "type": "path-param",
+        "value": "fooVal",
+      },
+    ],
+  },
+}
+`);
+    });
+  });
+
+  it('should encode with parent', () => {
+    const parentEncoderFactory = createPathEncoderFactory({
+      path: 'hello/:foo',
+      params: {
+        foo: params.string(),
+      },
+    });
+    const encoderFactory = createPathEncoderFactory({
+      path: 'hi/:bar',
+      params: {
+        bar: params.string(),
+      },
+    });
+    const parentEncoder = parentEncoderFactory();
+    const encoder = encoderFactory(parentEncoder);
+
+    const result = encoder.encode({
+      // @ts-expect-error fixme
+      foo: 'fooVal',
+      bar: 'barVal',
+    });
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {
+    "segments": [
+      {
+        "name": "hello",
+        "type": "path",
+      },
+      {
+        "type": "path-param",
+        "value": "fooVal",
+      },
+      {
+        "name": "hi",
+        "type": "path",
+      },
+      {
+        "type": "path-param",
+        "value": "barVal",
+      },
+    ],
+  },
+}
+`);
+  });
 });

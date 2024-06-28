@@ -1,4 +1,4 @@
-import { Path } from './path';
+import { Path, PathSegment } from './path';
 import { Encoders } from './encoders';
 import { Encoder, EncoderResult } from './encoder';
 import {
@@ -104,8 +104,41 @@ class PathEncoder<TParams, TParentParams>
   ) {}
 
   encode(value: TParentParams & TParams): EncoderResult<Path> {
-    // @ts-expect-error fixme
-    return value;
+    if (this.parent !== undefined) {
+      const parentResult = this.parent.encode(value);
+      if (!parentResult.valid) {
+        return {
+          valid: false,
+        };
+      }
+      const segments = this.encodeSegments(value);
+      if (segments === undefined) {
+        return {
+          valid: false,
+        };
+      }
+
+      return {
+        valid: true,
+        value: {
+          segments: [...parentResult.value.segments, ...segments],
+        },
+      };
+    } else {
+      const segments = this.encodeSegments(value);
+      if (segments === undefined) {
+        return {
+          valid: false,
+        };
+      }
+
+      return {
+        valid: true,
+        value: {
+          segments,
+        },
+      };
+    }
   }
 
   decode(value: Path): PathEncoderResult<TParentParams & TParams> {
@@ -126,7 +159,10 @@ class PathEncoder<TParams, TParentParams>
         }
       } else if (parentResult.consumed !== -1) {
         // parent did not consume all the segments, but the segments it consumed so far are valid
-        const params = this.matchPath(value, parentResult.consumed);
+        const params = this.decodeSegments(
+          value.segments,
+          parentResult.consumed
+        );
         if (params === undefined) {
           return {
             valid: false,
@@ -150,7 +186,7 @@ class PathEncoder<TParams, TParentParams>
         };
       }
     } else {
-      const params = this.matchPath(value, 0);
+      const params = this.decodeSegments(value.segments, 0);
       if (params === undefined) {
         return {
           valid: false,
@@ -169,10 +205,10 @@ class PathEncoder<TParams, TParentParams>
     }
   }
 
-  private matchPath(path: Path, consumed: number) {
+  private decodeSegments(segments: PathSegment[], consumed: number) {
     const params: any = {};
     for (let i = 0; i < this.path.length; i++) {
-      const segmentValue = path.segments[consumed + i];
+      const segmentValue = segments[consumed + i];
       if (segmentValue === undefined) {
         return undefined;
       }
@@ -190,19 +226,63 @@ class PathEncoder<TParams, TParentParams>
           if (segmentValue.type !== 'path-param') {
             return undefined;
           } else {
-            const paramEncoder = (this.params as any)[segment.name] as Encoder<
-              unknown,
-              unknown
-            >;
-            const paramEncoderResult = paramEncoder.decode(segmentValue);
-            if (!paramEncoderResult.valid) {
+            const param = this.decodeParam(segment.name, segmentValue.value);
+            if (param === undefined) {
               return undefined;
             }
-            params[segment.name] = segmentValue.value;
+            params[segment.name] = param;
           }
           break;
       }
     }
     return params;
+  }
+
+  private encodeSegments(
+    params: TParentParams & TParams
+  ): PathSegment[] | undefined {
+    const segments: PathSegment[] = [];
+    for (const segment of this.path) {
+      switch (segment.type) {
+        case 'path':
+          segments.push(segment);
+          break;
+        case 'path-param': {
+          const param = (params as any)[segment.name];
+          const segmentValue = this.encodeParam(segment.name, param);
+          if (segmentValue === undefined) {
+            return undefined;
+          }
+          segments.push({
+            type: 'path-param',
+            value: segmentValue,
+          });
+          break;
+        }
+      }
+    }
+    return segments;
+  }
+
+  private encodeParam(name: string, param: unknown): string | undefined {
+    const paramEncoder = (this.params as any)[name] as Encoder<string, unknown>;
+    if (paramEncoder === undefined) {
+      return undefined;
+    }
+    const result = paramEncoder.encode(param);
+    if (!result.valid) {
+      return undefined;
+    }
+
+    return result.value;
+  }
+
+  private decodeParam(name: string, param: string) {
+    const paramEncoder = (this.params as any)[name] as Encoder<string, unknown>;
+    const result = paramEncoder.decode(param);
+    if (!result.valid) {
+      return undefined;
+    }
+    return result.value;
   }
 }
