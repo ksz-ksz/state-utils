@@ -1,4 +1,3 @@
-import { Encoder } from './encoder';
 import { Fragment } from './fragment';
 import { EncoderFactory } from './encoder-factory';
 
