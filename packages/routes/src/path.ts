@@ -1,19 +1,7 @@
 import { Encoder } from './encoder';
 
-export interface PathPathSegment {
-  type: 'path';
-  name: string;
-}
-
-export interface PathParamPathSegment {
-  type: 'path-param';
-  value: string;
-}
-
-export type PathSegment = PathPathSegment | PathParamPathSegment;
-
 export interface Path {
-  segments: PathSegment[];
+  segments: string[];
 }
 
 export function createPathEncoder(): Encoder<string, Path> {

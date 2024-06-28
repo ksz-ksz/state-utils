@@ -1,9 +1,9 @@
-import { Path, PathSegment } from './path';
+import { Path } from './path';
 import { Encoders } from './encoders';
 import { Encoder, EncoderResult } from './encoder';
 import {
-  PathEncoderFactory,
   PathEncoder as _PathEncoder,
+  PathEncoderFactory,
   PathEncoderResult as _PathEncoderResult,
 } from './routing';
 
@@ -205,7 +205,7 @@ class PathEncoder<TParams, TParentParams>
     }
   }
 
-  private decodeSegments(segments: PathSegment[], consumed: number) {
+  private decodeSegments(segments: string[], consumed: number) {
     const params: any = {};
     for (let i = 0; i < this.path.length; i++) {
       const segmentValue = segments[consumed + i];
@@ -215,24 +215,19 @@ class PathEncoder<TParams, TParentParams>
       const segment = this.path[i];
       switch (segment.type) {
         case 'path':
-          if (
-            segmentValue.type != 'path' ||
-            segmentValue.name !== segment.name
-          ) {
+          if (segmentValue !== segment.name) {
             return undefined;
           }
           break;
-        case 'path-param':
-          if (segmentValue.type !== 'path-param') {
+        case 'path-param': {
+          const param = this.decodeParam(segment.name, segmentValue);
+          if (param === undefined) {
             return undefined;
-          } else {
-            const param = this.decodeParam(segment.name, segmentValue.value);
-            if (param === undefined) {
-              return undefined;
-            }
-            params[segment.name] = param;
           }
+          params[segment.name] = param;
+
           break;
+        }
       }
     }
     return params;
@@ -240,12 +235,12 @@ class PathEncoder<TParams, TParentParams>
 
   private encodeSegments(
     params: TParentParams & TParams
-  ): PathSegment[] | undefined {
-    const segments: PathSegment[] = [];
+  ): string[] | undefined {
+    const segments: string[] = [];
     for (const segment of this.path) {
       switch (segment.type) {
         case 'path':
-          segments.push(segment);
+          segments.push(segment.name);
           break;
         case 'path-param': {
           const param = (params as any)[segment.name];
@@ -253,10 +248,7 @@ class PathEncoder<TParams, TParentParams>
           if (segmentValue === undefined) {
             return undefined;
           }
-          segments.push({
-            type: 'path-param',
-            value: segmentValue,
-          });
+          segments.push(segmentValue);
           break;
         }
       }

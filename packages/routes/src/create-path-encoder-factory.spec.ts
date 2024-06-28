@@ -13,16 +13,7 @@ describe('create-path-encoder-factory', () => {
       const encoder = encoderFactory();
 
       const result = encoder.decode({
-        segments: [
-          {
-            type: 'path',
-            name: 'hello',
-          },
-          {
-            type: 'path-param',
-            value: 'fooVal',
-          },
-        ],
+        segments: ['hello', 'fooVal'],
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -54,24 +45,7 @@ describe('create-path-encoder-factory', () => {
       const encoder = encoderFactory(parentEncoder);
 
       const result = encoder.decode({
-        segments: [
-          {
-            type: 'path',
-            name: 'hello',
-          },
-          {
-            type: 'path-param',
-            value: 'fooVal',
-          },
-          {
-            type: 'path',
-            name: 'hi',
-          },
-          {
-            type: 'path-param',
-            value: 'barVar',
-          },
-        ],
+        segments: ['hello', 'fooVal', 'hi', 'barVar'],
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -114,14 +88,8 @@ describe('create-path-encoder-factory', () => {
   "valid": true,
   "value": {
     "segments": [
-      {
-        "name": "hello",
-        "type": "path",
-      },
-      {
-        "type": "path-param",
-        "value": "fooVal",
-      },
+      "hello",
+      "fooVal",
     ],
   },
 }
@@ -156,22 +124,10 @@ describe('create-path-encoder-factory', () => {
   "valid": true,
   "value": {
     "segments": [
-      {
-        "name": "hello",
-        "type": "path",
-      },
-      {
-        "type": "path-param",
-        "value": "fooVal",
-      },
-      {
-        "name": "hi",
-        "type": "path",
-      },
-      {
-        "type": "path-param",
-        "value": "barVal",
-      },
+      "hello",
+      "fooVal",
+      "hi",
+      "barVal",
     ],
   },
 }
