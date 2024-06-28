@@ -19,8 +19,8 @@ export interface BooleanParamOptions {
 
 export const params: {
   string(options?: StringParamOptions): Encoder<string, string>;
-  number(options?: NumberParamOptions): Encoder<number, string>;
-  boolean(options?: BooleanParamOptions): Encoder<boolean, string>;
+  number(options?: NumberParamOptions): Encoder<string, number>;
+  boolean(options?: BooleanParamOptions): Encoder<string, boolean>;
 } = {
   string(options = {}) {
     return new StringParamEncoder(options);
@@ -63,6 +63,9 @@ class StringParamEncoder implements Encoder<string, string> {
   }
 
   private isValid(value: string) {
+    if (typeof value !== 'string') {
+      return false;
+    }
     const { pattern, minLength, maxLength } = this.options;
     if (pattern !== undefined && !pattern.test(value)) {
       return false;
@@ -78,10 +81,10 @@ class StringParamEncoder implements Encoder<string, string> {
   }
 }
 
-class NumberParamEncoder implements Encoder<number, string> {
+class NumberParamEncoder implements Encoder<string, number> {
   constructor(private readonly options: NumberParamOptions) {}
 
-  encode(value: string): EncoderResult<number> {
+  decode(value: string): EncoderResult<number> {
     const encodedValue = Number(value);
     if (this.isValid(encodedValue)) {
       return {
@@ -95,7 +98,7 @@ class NumberParamEncoder implements Encoder<number, string> {
     }
   }
 
-  decode(value: number): EncoderResult<string> {
+  encode(value: number): EncoderResult<string> {
     if (this.isValid(value)) {
       return {
         valid: true,
@@ -109,6 +112,9 @@ class NumberParamEncoder implements Encoder<number, string> {
   }
 
   private isValid(value: number) {
+    if (typeof value !== 'number') {
+      return false;
+    }
     if (Number.isNaN(value)) {
       return false;
     }
@@ -128,10 +134,10 @@ class NumberParamEncoder implements Encoder<number, string> {
   }
 }
 
-class BooleanParamEncoder implements Encoder<boolean, string> {
+class BooleanParamEncoder implements Encoder<string, boolean> {
   constructor(private readonly options: BooleanParamOptions) {}
 
-  encode(value: string): EncoderResult<boolean> {
+  decode(value: string): EncoderResult<boolean> {
     const encodedValue = this.parse(value);
     if (encodedValue !== undefined) {
       return {
@@ -145,7 +151,12 @@ class BooleanParamEncoder implements Encoder<boolean, string> {
     }
   }
 
-  decode(value: boolean): EncoderResult<string> {
+  encode(value: boolean): EncoderResult<string> {
+    if (typeof value !== 'boolean') {
+      return {
+        valid: false,
+      };
+    }
     const decodedValue = this.format(value);
     return {
       valid: true,

@@ -38,14 +38,14 @@ describe('create-path-encoder-factory', () => {
       const encoderFactory = createPathEncoderFactory({
         path: 'hi/:bar',
         params: {
-          bar: params.string(),
+          bar: params.number(),
         },
       });
       const parentEncoder = parentEncoderFactory();
       const encoder = encoderFactory(parentEncoder);
 
       const result = encoder.decode({
-        segments: ['hello', 'fooVal', 'hi', 'barVar'],
+        segments: ['hello', 'fooVal', 'hi', '42'],
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -61,7 +61,7 @@ describe('create-path-encoder-factory', () => {
   },
   "valid": true,
   "value": {
-    "bar": "barVar",
+    "bar": 42,
     "foo": "fooVal",
   },
 }
