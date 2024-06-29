@@ -12,9 +12,7 @@ describe('create-path-encoder-factory', () => {
       });
       const encoder = encoderFactory();
 
-      const result = encoder.decode({
-        segments: ['hello', 'fooVal'],
-      });
+      const result = encoder.decode(['hello', 'fooVal']);
 
       expect(result).toMatchInlineSnapshot(`
 {
@@ -44,9 +42,7 @@ describe('create-path-encoder-factory', () => {
       const parentEncoder = parentEncoderFactory();
       const encoder = encoderFactory(parentEncoder);
 
-      const result = encoder.decode({
-        segments: ['hello', 'fooVal', 'hi', '42'],
-      });
+      const result = encoder.decode(['hello', 'fooVal', 'hi', '42']);
 
       expect(result).toMatchInlineSnapshot(`
 {
@@ -86,12 +82,10 @@ describe('create-path-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "valid": true,
-  "value": {
-    "segments": [
-      "hello",
-      "fooVal",
-    ],
-  },
+  "value": [
+    "hello",
+    "fooVal",
+  ],
 }
 `);
     });
@@ -122,14 +116,12 @@ describe('create-path-encoder-factory', () => {
     expect(result).toMatchInlineSnapshot(`
 {
   "valid": true,
-  "value": {
-    "segments": [
-      "hello",
-      "fooVal",
-      "hi",
-      "barVal",
-    ],
-  },
+  "value": [
+    "hello",
+    "fooVal",
+    "hi",
+    "barVal",
+  ],
 }
 `);
   });

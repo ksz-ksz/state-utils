@@ -1,8 +1,6 @@
 import { Encoder } from './encoder';
 
-export interface Path {
-  segments: string[];
-}
+export type Path = string[];
 
 export function createPathEncoder(): Encoder<string, Path> {
   // @ts-expect-error fixme

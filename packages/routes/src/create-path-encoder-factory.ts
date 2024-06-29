@@ -120,9 +120,7 @@ class PathEncoder<TParams, TParentParams>
 
       return {
         valid: true,
-        value: {
-          segments: [...parentResult.value.segments, ...segments],
-        },
+        value: [...parentResult.value, ...segments],
       };
     } else {
       const segments = this.encodeSegments(value);
@@ -134,9 +132,7 @@ class PathEncoder<TParams, TParentParams>
 
       return {
         valid: true,
-        value: {
-          segments,
-        },
+        value: segments,
       };
     }
   }
@@ -159,10 +155,7 @@ class PathEncoder<TParams, TParentParams>
         }
       } else if (parentResult.consumed !== -1) {
         // parent did not consume all the segments, but the segments it consumed so far are valid
-        const params = this.decodeSegments(
-          value.segments,
-          parentResult.consumed
-        );
+        const params = this.decodeSegments(value, parentResult.consumed);
         if (params === undefined) {
           return {
             valid: false,
@@ -173,7 +166,7 @@ class PathEncoder<TParams, TParentParams>
 
         const consumed = parentResult.consumed + this.path.length;
         return {
-          valid: consumed === value.segments.length,
+          valid: consumed === value.length,
           consumed,
           parent: parentResult,
           value: { ...parentResult.value, ...params },
@@ -186,7 +179,7 @@ class PathEncoder<TParams, TParentParams>
         };
       }
     } else {
-      const params = this.decodeSegments(value.segments, 0);
+      const params = this.decodeSegments(value, 0);
       if (params === undefined) {
         return {
           valid: false,
@@ -197,7 +190,7 @@ class PathEncoder<TParams, TParentParams>
 
       const consumed = this.path.length;
       return {
-        valid: consumed === value.segments.length,
+        valid: consumed === value.length,
         consumed,
         parent: undefined,
         value: params,
