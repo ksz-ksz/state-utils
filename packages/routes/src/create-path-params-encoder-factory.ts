@@ -2,9 +2,9 @@ import { Path } from './path';
 import { Encoders } from './encoders';
 import { Encoder, EncoderResult } from './encoder';
 import {
-  PathEncoder as _PathEncoder,
-  PathEncoderFactory,
-  PathEncoderResult as _PathEncoderResult,
+  ParamsEncoder,
+  ParamsEncoderFactory,
+  ParamsEncoderResult,
 } from './routing';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
@@ -36,7 +36,7 @@ export function createPathParamsEncoderFactory<
         path: TPath;
         params: Encoders<TParams>;
       }
-): PathEncoderFactory<Path, TParentParams & TParams, TParentParams> {
+): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
   return (parent) => {
     return new PathParamsEncoder(
       // @ts-expect-error unsafe parent cast
@@ -90,7 +90,7 @@ function parsePath(path: string): Segment[] {
   return parseNormalizedPath(normalizePath(path));
 }
 
-type PathEncoderResult<T> = _PathEncoderResult<T> & {
+type PathEncoderResult<T> = ParamsEncoderResult<T> & {
   /**
    * - positive integer - a number of successfully consumed path segments
    * - -1 - means that the Path cannot be decoded
@@ -99,7 +99,7 @@ type PathEncoderResult<T> = _PathEncoderResult<T> & {
 };
 
 class PathParamsEncoder<TParams, TParentParams>
-  implements _PathEncoder<Path, TParentParams & TParams>
+  implements ParamsEncoder<Path, TParentParams & TParams>
 {
   constructor(
     private readonly parent:

@@ -4,37 +4,38 @@ import { Route } from './route';
 import { EncoderFactory } from './encoder-factory';
 import { Historian } from './historian';
 
-export type PathEncoderResult<T> = EncoderResult<T> & {
+export type ParamsEncoderResult<T> = EncoderResult<T> & {
   // route: Route<T, unknown, unknown>;
-  parent: PathEncoderResult<unknown> | undefined;
+  parent: ParamsEncoderResult<unknown> | undefined;
 };
 
-export interface PathEncoder<TEncodedParams, TDecodedParams>
-  extends Encoder<TEncodedParams, TDecodedParams> {
-  decode(value: TEncodedParams): PathEncoderResult<TDecodedParams>;
+export interface ParamsEncoder<TEncoded, TParams>
+  extends Encoder<TEncoded, TParams> {
+  decode(
+    value: TEncoded,
+    parentResult?: ParamsEncoderResult<unknown>
+  ): ParamsEncoderResult<TParams>;
 }
 
-export interface PathEncoderFactory<TEncoded, TDecoded, TParentDecoded> {
+export interface ParamsEncoderFactory<TEncoded, TParams, TParentParams> {
   (
-    parent?: PathEncoder<TEncoded, TParentDecoded>
-  ): PathEncoder<TEncoded, TDecoded>;
+    parent?: ParamsEncoder<TEncoded, TParentParams>
+  ): ParamsEncoder<TEncoded, TParams>;
 }
 
-export interface PathEncoderFactoryFn<
-  TEncodedParams,
-  TDecodedParams,
-  TParentDecodedParams,
-> {
-  (
-    ...args: any[]
-  ): PathEncoderFactory<TEncodedParams, TDecodedParams, TParentDecodedParams>;
+export interface ParamsEncoderFactoryFn<TEncoded, TParams, TParentParams> {
+  (...args: any[]): ParamsEncoderFactory<TEncoded, TParams, TParentParams>;
 }
 
 export interface Routing<
   TPath,
   TQuery,
   TFragment,
-  TPathParamsEncoder extends PathEncoderFactoryFn<TPath, unknown, unknown>,
+  TPathParamsEncoderFactory extends ParamsEncoderFactoryFn<
+    TPath,
+    unknown,
+    unknown
+  >,
   TQueryParamsEncoderFactory extends EncoderFactoryFn<TQuery, unknown, unknown>,
   TFragmentParamsEncoderFactory extends EncoderFactoryFn<
     TFragment,
@@ -42,7 +43,7 @@ export interface Routing<
     unknown
   >,
 > {
-  path: TPathParamsEncoder;
+  path: TPathParamsEncoderFactory;
   query: TQueryParamsEncoderFactory;
   fragment: TFragmentParamsEncoderFactory;
   pathEncoder: Encoder<string, TPath>;
@@ -62,7 +63,7 @@ export interface Routing<
       TParentQueryParams,
       TParentFragmentParams
     >;
-    path?: PathEncoderFactory<TPath, TPathParams, TParentPathParams>;
+    path?: ParamsEncoderFactory<TPath, TPathParams, TParentPathParams>;
     query?: EncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
     fragment?: EncoderFactory<
       TFragment,
@@ -83,7 +84,7 @@ export function createRouting<
   TPath,
   TQuery,
   TFragment,
-  TPathParamsEncoderFactory extends PathEncoderFactoryFn<
+  TPathParamsEncoderFactory extends ParamsEncoderFactoryFn<
     TPath,
     unknown,
     unknown
