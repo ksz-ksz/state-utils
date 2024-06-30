@@ -5,7 +5,7 @@ import {
   ParamsEncoder,
   ParamsEncoderFactory,
   ParamsEncoderResult,
-} from './routing';
+} from './params-encoder';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
   ? never

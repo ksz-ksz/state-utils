@@ -1,37 +1,18 @@
 import { EncoderFactoryFn } from './encoder-factory-fn';
-import { Encoder, EncoderResult } from './encoder';
+import { Encoder } from './encoder';
 import { Route } from './route';
 import { EncoderFactory } from './encoder-factory';
 import { Historian } from './historian';
-
-export type ParamsEncoderResult<T> = EncoderResult<T> & {
-  // route: Route<T, unknown, unknown>;
-  parent: ParamsEncoderResult<unknown> | undefined;
-};
-
-export interface ParamsEncoder<TEncoded, TParams>
-  extends Encoder<TEncoded, TParams> {
-  decode(
-    value: TEncoded,
-    parentResult?: ParamsEncoderResult<unknown>
-  ): ParamsEncoderResult<TParams>;
-}
-
-export interface ParamsEncoderFactory<TEncoded, TParams, TParentParams> {
-  (
-    parent?: ParamsEncoder<TEncoded, TParentParams>
-  ): ParamsEncoder<TEncoded, TParams>;
-}
-
-export interface ParamsEncoderFactoryFn<TEncoded, TParams, TParentParams> {
-  (...args: any[]): ParamsEncoderFactory<TEncoded, TParams, TParentParams>;
-}
+import {
+  CreateParamsEncoderFactory,
+  ParamsEncoderFactory,
+} from './params-encoder';
 
 export interface Routing<
   TPath,
   TQuery,
   TFragment,
-  TPathParamsEncoderFactory extends ParamsEncoderFactoryFn<
+  TPathParamsEncoderFactory extends CreateParamsEncoderFactory<
     TPath,
     unknown,
     unknown
@@ -84,7 +65,7 @@ export function createRouting<
   TPath,
   TQuery,
   TFragment,
-  TPathParamsEncoderFactory extends ParamsEncoderFactoryFn<
+  TPathParamsEncoderFactory extends CreateParamsEncoderFactory<
     TPath,
     unknown,
     unknown
