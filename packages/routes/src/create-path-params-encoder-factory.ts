@@ -22,7 +22,7 @@ export type PathParams<TPath extends string> = {
   [K in InferParamNames<TPath>]: unknown;
 };
 
-export function createPathEncoderFactory<
+export function createPathParamsEncoderFactory<
   TPath extends string,
   TParams extends PathParams<TPath>,
   TParentParams,
@@ -38,22 +38,26 @@ export function createPathEncoderFactory<
       }
 ): PathEncoderFactory<Path, TParentParams & TParams, TParentParams> {
   return (parent) => {
-    // @ts-expect-error unsafe parent cast
-    return new PathEncoder(parent, parsePath(options.path), options.params);
+    return new PathParamsEncoder(
+      // @ts-expect-error unsafe parent cast
+      parent,
+      parsePath(options.path),
+      options.params
+    );
   };
 }
 
-interface PathPathEncoderSegment {
+interface PathSegment {
   type: 'path';
   name: string;
 }
 
-interface PathParamEncoderSegment {
+interface PathParamSegment {
   type: 'path-param';
   name: string;
 }
 
-type PathEncoderSegment = PathPathEncoderSegment | PathParamEncoderSegment;
+type Segment = PathSegment | PathParamSegment;
 
 function normalizePath(path: string): string {
   let normalizedPath = path.replaceAll(/\/+/g, '/');
@@ -66,8 +70,8 @@ function normalizePath(path: string): string {
   return normalizedPath;
 }
 
-function parseNormalizedPath(path: string): PathEncoderSegment[] {
-  return path.split('/').map((segment): PathEncoderSegment => {
+function parseNormalizedPath(path: string): Segment[] {
+  return path.split('/').map((segment): Segment => {
     if (segment.startsWith(':')) {
       return {
         type: 'path-param',
@@ -82,7 +86,7 @@ function parseNormalizedPath(path: string): PathEncoderSegment[] {
   });
 }
 
-function parsePath(path: string): PathEncoderSegment[] {
+function parsePath(path: string): Segment[] {
   return parseNormalizedPath(normalizePath(path));
 }
 
@@ -94,12 +98,14 @@ type PathEncoderResult<T> = _PathEncoderResult<T> & {
   consumed: number;
 };
 
-class PathEncoder<TParams, TParentParams>
+class PathParamsEncoder<TParams, TParentParams>
   implements _PathEncoder<Path, TParentParams & TParams>
 {
   constructor(
-    private readonly parent: PathEncoder<TParentParams, unknown> | undefined,
-    private readonly path: PathEncoderSegment[],
+    private readonly parent:
+      | PathParamsEncoder<TParentParams, unknown>
+      | undefined,
+    private readonly path: Segment[],
     private readonly params: Encoders<TParams>
   ) {}
 

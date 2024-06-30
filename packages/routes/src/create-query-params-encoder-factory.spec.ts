@@ -1,10 +1,10 @@
-import { createQueryEncoderFactory } from './create-query-encoder-factory';
+import { createQueryParamsEncoderFactory } from './create-query-params-encoder-factory';
 import { params } from './params';
 
-describe('create-query-encoder-factory', () => {
+describe('create-query-params-encoder-factory', () => {
   describe('decode', () => {
     it('should decode', () => {
-      const encoderFactory = createQueryEncoderFactory({
+      const encoderFactory = createQueryParamsEncoderFactory({
         params: {
           foo: params.string(),
         },
@@ -25,12 +25,12 @@ describe('create-query-encoder-factory', () => {
 `);
     });
     it('should decode with parent', () => {
-      const parentEncoderFactory = createQueryEncoderFactory({
+      const parentEncoderFactory = createQueryParamsEncoderFactory({
         params: {
           foo: params.string(),
         },
       });
-      const encoderFactory = createQueryEncoderFactory({
+      const encoderFactory = createQueryParamsEncoderFactory({
         params: {
           bar: params.number(),
         },
@@ -57,7 +57,7 @@ describe('create-query-encoder-factory', () => {
 
   describe('encode', () => {
     it('should encode', () => {
-      const encoderFactory = createQueryEncoderFactory({
+      const encoderFactory = createQueryParamsEncoderFactory({
         params: {
           foo: params.string(),
         },
@@ -79,12 +79,12 @@ describe('create-query-encoder-factory', () => {
     });
 
     it('should encode with parent', () => {
-      const parentEncoderFactory = createQueryEncoderFactory({
+      const parentEncoderFactory = createQueryParamsEncoderFactory({
         params: {
           foo: params.string(),
         },
       });
-      const encoderFactory = createQueryEncoderFactory({
+      const encoderFactory = createQueryParamsEncoderFactory({
         params: {
           bar: params.number(),
         },

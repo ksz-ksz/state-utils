@@ -1,8 +1,8 @@
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
-import { createPathEncoderFactory } from './create-path-encoder-factory';
-import { createQueryEncoderFactory } from './create-query-encoder-factory';
-import { createFragmentEncoderFactory } from './create-fragment-encoder-factory';
+import { createPathParamsEncoderFactory } from './create-path-params-encoder-factory';
+import { createQueryParamsEncoderFactory } from './create-query-params-encoder-factory';
+import { createFragmentParamsEncoderFactory } from './create-fragment-params-encoder-factory';
 import { createPlace } from './place';
 import { params } from './params';
 import { createPathEncoder } from './path-encoder';
@@ -14,9 +14,9 @@ const routing = createRouting({
   pathEncoder: createPathEncoder(),
   queryEncoder: createQueryEncoder(),
   fragmentEncoder: createFragmentEncoder(),
-  pathParamsEncoderFactory: createPathEncoderFactory,
-  queryParamsEncoderFactory: createQueryEncoderFactory,
-  fragmentParamsEncoderFactory: createFragmentEncoderFactory,
+  pathParamsEncoderFactory: createPathParamsEncoderFactory,
+  queryParamsEncoderFactory: createQueryParamsEncoderFactory,
+  fragmentParamsEncoderFactory: createFragmentParamsEncoderFactory,
 });
 
 const rootRoute = routing.createRoute({

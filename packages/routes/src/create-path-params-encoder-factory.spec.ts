@@ -1,10 +1,10 @@
-import { createPathEncoderFactory } from './create-path-encoder-factory';
+import { createPathParamsEncoderFactory } from './create-path-params-encoder-factory';
 import { params } from './params';
 
-describe('create-path-encoder-factory', () => {
+describe('create-path-params-encoder-factory', () => {
   describe('decode', () => {
     it('should decode', () => {
-      const encoderFactory = createPathEncoderFactory({
+      const encoderFactory = createPathParamsEncoderFactory({
         path: 'hello/:foo',
         params: {
           foo: params.string(),
@@ -27,13 +27,13 @@ describe('create-path-encoder-factory', () => {
     });
 
     it('should decode with parent', () => {
-      const parentEncoderFactory = createPathEncoderFactory({
+      const parentEncoderFactory = createPathParamsEncoderFactory({
         path: 'hello/:foo',
         params: {
           foo: params.string(),
         },
       });
-      const encoderFactory = createPathEncoderFactory({
+      const encoderFactory = createPathParamsEncoderFactory({
         path: 'hi/:bar',
         params: {
           bar: params.number(),
@@ -67,7 +67,7 @@ describe('create-path-encoder-factory', () => {
 
   describe('encode', () => {
     it('should encode', () => {
-      const encoderFactory = createPathEncoderFactory({
+      const encoderFactory = createPathParamsEncoderFactory({
         path: 'hello/:foo',
         params: {
           foo: params.string(),
@@ -92,13 +92,13 @@ describe('create-path-encoder-factory', () => {
   });
 
   it('should encode with parent', () => {
-    const parentEncoderFactory = createPathEncoderFactory({
+    const parentEncoderFactory = createPathParamsEncoderFactory({
       path: 'hello/:foo',
       params: {
         foo: params.string(),
       },
     });
-    const encoderFactory = createPathEncoderFactory({
+    const encoderFactory = createPathParamsEncoderFactory({
       path: 'hi/:bar',
       params: {
         bar: params.string(),

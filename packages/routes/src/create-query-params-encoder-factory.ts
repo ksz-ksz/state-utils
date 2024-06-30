@@ -3,14 +3,17 @@ import { Query } from './query';
 import { EncoderFactory } from './encoder-factory';
 import { Encoder, EncoderResult } from './encoder';
 
-export function createQueryEncoderFactory<TParams, TParentParams>(options?: {
+export function createQueryParamsEncoderFactory<
+  TParams,
+  TParentParams,
+>(options?: {
   params?: Encoders<TParams>;
 }): EncoderFactory<Query, Partial<TParentParams & TParams>, TParentParams> {
   // @ts-expect-error unsafe cast
-  return (parent) => new QueryEncoder(parent, options.params);
+  return (parent) => new QueryParamsEncoder(parent, options.params);
 }
 
-class QueryEncoder<TParams, TParentParams>
+class QueryParamsEncoder<TParams, TParentParams>
   implements Encoder<Query, Partial<TParentParams & TParams>>
 {
   constructor(
