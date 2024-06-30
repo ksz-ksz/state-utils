@@ -1,6 +1,5 @@
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
-import { createFragmentEncoder } from './fragment';
 import { createPathEncoderFactory } from './create-path-encoder-factory';
 import { createQueryEncoderFactory } from './create-query-encoder-factory';
 import { createFragmentEncoderFactory } from './create-fragment-encoder-factory';
@@ -8,6 +7,7 @@ import { createPlace } from './place';
 import { params } from './params';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
+import { createFragmentEncoder } from './fragment-encoder';
 
 const routing = createRouting({
   historian: createBrowserHistorian(),
