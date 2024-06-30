@@ -31,64 +31,84 @@ export interface PathEncoderFactoryFn<
 }
 
 export interface Routing<
-  TEncodedPath,
-  TEncodedQuery,
-  TEncodedFragment,
-  TCreatePath extends PathEncoderFactoryFn<TEncodedPath, unknown, unknown>,
-  TCreateQuery extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
-  TCreateFragment extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
+  TPath,
+  TQuery,
+  TFragment,
+  TPathParamsEncoder extends PathEncoderFactoryFn<TPath, unknown, unknown>,
+  TQueryParamsEncoderFactory extends EncoderFactoryFn<TQuery, unknown, unknown>,
+  TFragmentParamsEncoderFactory extends EncoderFactoryFn<
+    TFragment,
+    unknown,
+    unknown
+  >,
 > {
-  path: TCreatePath;
-  query: TCreateQuery;
-  fragment: TCreateFragment;
-  pathEncoder: Encoder<string, TEncodedPath>;
-  queryEncoder: Encoder<string, TEncodedQuery>;
-  fragmentEncoder: Encoder<string, TEncodedFragment>;
+  path: TPathParamsEncoder;
+  query: TQueryParamsEncoderFactory;
+  fragment: TFragmentParamsEncoderFactory;
+  pathEncoder: Encoder<string, TPath>;
+  queryEncoder: Encoder<string, TQuery>;
+  fragmentEncoder: Encoder<string, TFragment>;
 
   createRoute: <
-    TParentPath = never,
-    TParentQuery = never,
-    TParentFragment = never,
-    TPath = TParentPath,
-    TQuery = TParentQuery,
-    TFragment = TParentFragment,
+    TParentPathParams = never,
+    TParentQueryParams = never,
+    TParentFragmentParams = never,
+    TPathParams = TParentPathParams,
+    TQueryParams = TParentQueryParams,
+    TFragmentParams = TParentFragmentParams,
   >(options: {
-    parent?: Route<TParentPath, TParentQuery, TParentFragment>;
-    path?: PathEncoderFactory<TEncodedPath, TPath, TParentPath>;
-    query?: EncoderFactory<TEncodedQuery, TQuery, TParentQuery>;
-    fragment?: EncoderFactory<TEncodedFragment, TFragment, TParentFragment>;
+    parent?: Route<
+      TParentPathParams,
+      TParentQueryParams,
+      TParentFragmentParams
+    >;
+    path?: PathEncoderFactory<TPath, TPathParams, TParentPathParams>;
+    query?: EncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
+    fragment?: EncoderFactory<
+      TFragment,
+      TFragmentParams,
+      TParentFragmentParams
+    >;
   }) => Route<
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
     TPath,
     TQuery,
-    TFragment,
-    TEncodedPath,
-    TEncodedQuery,
-    TEncodedFragment
+    TFragment
   >;
 }
 
 export function createRouting<
-  TEncodedPath,
-  TEncodedQuery,
-  TEncodedFragment,
-  TCreatePath extends PathEncoderFactoryFn<TEncodedPath, unknown, unknown>,
-  TCreateQuery extends EncoderFactoryFn<TEncodedQuery, unknown, unknown>,
-  TCreateFragment extends EncoderFactoryFn<TEncodedFragment, unknown, unknown>,
+  TPath,
+  TQuery,
+  TFragment,
+  TPathParamsEncoderFactory extends PathEncoderFactoryFn<
+    TPath,
+    unknown,
+    unknown
+  >,
+  TQueryParamsEncoderFactory extends EncoderFactoryFn<TQuery, unknown, unknown>,
+  TFragmentParamsEncoderFactory extends EncoderFactoryFn<
+    TFragment,
+    unknown,
+    unknown
+  >,
 >(options: {
   historian: Historian;
-  pathEncoder: Encoder<string, TEncodedPath>;
-  queryEncoder: Encoder<string, TEncodedQuery>;
-  fragmentEncoder: Encoder<string, TEncodedFragment>;
-  createPathEncoderFactory: TCreatePath;
-  createQueryEncoderFactory: TCreateQuery;
-  createFragmentEncoderFactory: TCreateFragment;
+  pathEncoder: Encoder<string, TPath>;
+  queryEncoder: Encoder<string, TQuery>;
+  fragmentEncoder: Encoder<string, TFragment>;
+  createPathEncoderFactory: TPathParamsEncoderFactory;
+  createQueryEncoderFactory: TQueryParamsEncoderFactory;
+  createFragmentEncoderFactory: TFragmentParamsEncoderFactory;
 }): Routing<
-  TEncodedPath,
-  TEncodedQuery,
-  TEncodedFragment,
-  TCreatePath,
-  TCreateQuery,
-  TCreateFragment
+  TPath,
+  TQuery,
+  TFragment,
+  TPathParamsEncoderFactory,
+  TQueryParamsEncoderFactory,
+  TFragmentParamsEncoderFactory
 > {
   // @ts-expect-error fixme
   return options;
