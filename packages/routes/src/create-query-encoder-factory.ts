@@ -5,11 +5,7 @@ import { Encoder, EncoderResult } from './encoder';
 
 export function createQueryEncoderFactory<TParams, TParentParams>(options?: {
   params?: Encoders<TParams>;
-}): EncoderFactory<
-  Query,
-  Partial<TParentParams & TParams>,
-  Partial<TParentParams>
-> {
+}): EncoderFactory<Query, Partial<TParentParams & TParams>, TParentParams> {
   // @ts-expect-error unsafe cast
   return (parent) => new QueryEncoder(parent, options.params);
 }

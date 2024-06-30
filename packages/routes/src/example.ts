@@ -1,6 +1,5 @@
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
-import { createPathEncoder } from './path';
 import { createQueryEncoder } from './query';
 import { createFragmentEncoder } from './fragment';
 import { createPathEncoderFactory } from './create-path-encoder-factory';
@@ -8,6 +7,7 @@ import { createQueryEncoderFactory } from './create-query-encoder-factory';
 import { createFragmentEncoderFactory } from './create-fragment-encoder-factory';
 import { createPlace } from './place';
 import { params } from './params';
+import { createPathEncoder } from './path-encoder';
 
 const routing = createRouting({
   historian: createBrowserHistorian(),
@@ -31,7 +31,9 @@ const rootRoute = routing.createRoute({
       queryParamBase: params.string(),
     },
   }),
-  fragment: routing.fragment(),
+  fragment: routing.fragment({
+    param: params.string(),
+  }),
 });
 
 const entityRoute = routing.createRoute({
