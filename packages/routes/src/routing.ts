@@ -44,7 +44,10 @@ export interface Routing<
     parent?: Route<
       TParentPathParams,
       TParentQueryParams,
-      TParentFragmentParams
+      TParentFragmentParams,
+      TPath,
+      TQuery,
+      TFragment
     >;
     path?: ParamsEncoderFactory<TPath, TPathParams, TParentPathParams>;
     query?: ParamsEncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
@@ -98,6 +101,23 @@ export function createRouting<
   TQueryParamsEncoderFactory,
   TFragmentParamsEncoderFactory
 > {
-  // @ts-expect-error fixme
-  return options;
+  let routeId = 0;
+
+  return {
+    path: options.pathParamsEncoderFactory,
+    query: options.queryParamsEncoderFactory,
+    fragment: options.fragmentParamsEncoderFactory,
+    pathEncoder: options.pathEncoder,
+    queryEncoder: options.queryEncoder,
+    fragmentEncoder: options.fragmentEncoder,
+    createRoute({ parent, path, query, fragment }) {
+      return {
+        id: routeId++,
+        parent,
+        pathEncoder: path?.(parent?.pathEncoder),
+        queryEncoder: query?.(parent?.queryEncoder),
+        fragmentEncoder: fragment?.(parent?.fragmentEncoder),
+      };
+    },
+  };
 }

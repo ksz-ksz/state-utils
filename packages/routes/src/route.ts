@@ -1,4 +1,4 @@
-import { Encoder } from './encoder';
+import { ParamsEncoder } from './params-encoder';
 
 export interface Route<
   TPathParams,
@@ -10,7 +10,9 @@ export interface Route<
 > {
   readonly id: number;
   readonly parent: Route<unknown, unknown, unknown> | undefined;
-  readonly pathEncoder: Encoder<TPath, TPathParams> | undefined;
-  readonly queryEncoder: Encoder<TQuery, TQueryParams> | undefined;
-  readonly fragmentEncoder: Encoder<TFragment, TFragmentParams> | undefined;
+  readonly pathEncoder: ParamsEncoder<TPath, TPathParams> | undefined;
+  readonly queryEncoder: ParamsEncoder<TQuery, TQueryParams> | undefined;
+  readonly fragmentEncoder:
+    | ParamsEncoder<TFragment, TFragmentParams>
+    | undefined;
 }
