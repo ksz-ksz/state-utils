@@ -1,16 +1,16 @@
 import { Encoder } from './encoder';
 
 export interface Route<
-  TPath,
-  TQuery,
-  TFragment,
-  TEncodedPath = unknown,
-  TEncodedQuery = unknown,
-  TEncodedFragment = unknown,
+  TPathParams,
+  TQueryParams,
+  TFragmentParams,
+  TPath = unknown,
+  TQuery = unknown,
+  TFragment = unknown,
 > {
   readonly id: number;
   readonly parent: Route<unknown, unknown, unknown> | undefined;
-  readonly pathEncoder: Encoder<TEncodedPath, TPath> | undefined;
-  readonly queryEncoder: Encoder<TEncodedQuery, TQuery> | undefined;
-  readonly fragmentEncoder: Encoder<TEncodedFragment, TFragment> | undefined;
+  readonly pathEncoder: Encoder<TPath, TPathParams> | undefined;
+  readonly queryEncoder: Encoder<TQuery, TQueryParams> | undefined;
+  readonly fragmentEncoder: Encoder<TFragment, TFragmentParams> | undefined;
 }
