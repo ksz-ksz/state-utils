@@ -14,9 +14,9 @@ const routing = createRouting({
   pathEncoder: createPathEncoder(),
   queryEncoder: createQueryEncoder(),
   fragmentEncoder: createFragmentEncoder(),
-  createPathEncoderFactory: createPathEncoderFactory,
-  createQueryEncoderFactory: createQueryEncoderFactory,
-  createFragmentEncoderFactory: createFragmentEncoderFactory,
+  pathParamsEncoderFactory: createPathEncoderFactory,
+  queryParamsEncoderFactory: createQueryEncoderFactory,
+  fragmentParamsEncoderFactory: createFragmentEncoderFactory,
 });
 
 const rootRoute = routing.createRoute({

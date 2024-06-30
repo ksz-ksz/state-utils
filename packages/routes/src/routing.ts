@@ -99,9 +99,9 @@ export function createRouting<
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
-  createPathEncoderFactory: TPathParamsEncoderFactory;
-  createQueryEncoderFactory: TQueryParamsEncoderFactory;
-  createFragmentEncoderFactory: TFragmentParamsEncoderFactory;
+  pathParamsEncoderFactory: TPathParamsEncoderFactory;
+  queryParamsEncoderFactory: TQueryParamsEncoderFactory;
+  fragmentParamsEncoderFactory: TFragmentParamsEncoderFactory;
 }): Routing<
   TPath,
   TQuery,
