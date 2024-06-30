@@ -106,7 +106,7 @@ class PathParamsEncoder<TParams, TParentParams>
       | PathParamsEncoder<TParentParams, unknown>
       | undefined,
     private readonly path: Segment[],
-    private readonly params: Encoders<TParams>
+    private readonly params: Encoders<TParams> = {} as Encoders<TParams>
   ) {}
 
   encode(value: TParentParams & TParams): EncoderResult<Path> {

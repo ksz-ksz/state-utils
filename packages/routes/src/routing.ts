@@ -1,7 +1,5 @@
-import { EncoderFactoryFn } from './encoder-factory-fn';
 import { Encoder } from './encoder';
 import { Route } from './route';
-import { EncoderFactory } from './encoder-factory';
 import { Historian } from './historian';
 import {
   CreateParamsEncoderFactory,
@@ -17,8 +15,12 @@ export interface Routing<
     unknown,
     unknown
   >,
-  TQueryParamsEncoderFactory extends EncoderFactoryFn<TQuery, unknown, unknown>,
-  TFragmentParamsEncoderFactory extends EncoderFactoryFn<
+  TQueryParamsEncoderFactory extends CreateParamsEncoderFactory<
+    TQuery,
+    unknown,
+    unknown
+  >,
+  TFragmentParamsEncoderFactory extends CreateParamsEncoderFactory<
     TFragment,
     unknown,
     unknown
@@ -45,8 +47,8 @@ export interface Routing<
       TParentFragmentParams
     >;
     path?: ParamsEncoderFactory<TPath, TPathParams, TParentPathParams>;
-    query?: EncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
-    fragment?: EncoderFactory<
+    query?: ParamsEncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
+    fragment?: ParamsEncoderFactory<
       TFragment,
       TFragmentParams,
       TParentFragmentParams
@@ -70,8 +72,12 @@ export function createRouting<
     unknown,
     unknown
   >,
-  TQueryParamsEncoderFactory extends EncoderFactoryFn<TQuery, unknown, unknown>,
-  TFragmentParamsEncoderFactory extends EncoderFactoryFn<
+  TQueryParamsEncoderFactory extends CreateParamsEncoderFactory<
+    TQuery,
+    unknown,
+    unknown
+  >,
+  TFragmentParamsEncoderFactory extends CreateParamsEncoderFactory<
     TFragment,
     unknown,
     unknown

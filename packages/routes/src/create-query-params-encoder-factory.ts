@@ -1,24 +1,36 @@
 import { Encoders } from './encoders';
 import { Query } from './query';
-import { EncoderFactory } from './encoder-factory';
 import { Encoder, EncoderResult } from './encoder';
+import {
+  ParamsEncoder,
+  ParamsEncoderFactory,
+  ParamsEncoderResult,
+} from './params-encoder';
 
 export function createQueryParamsEncoderFactory<
   TParams,
   TParentParams,
->(options?: {
+>(options: {
   params?: Encoders<TParams>;
-}): EncoderFactory<Query, Partial<TParentParams & TParams>, TParentParams> {
-  // @ts-expect-error unsafe cast
-  return (parent) => new QueryParamsEncoder(parent, options.params);
+}): ParamsEncoderFactory<
+  Query,
+  Partial<TParentParams & TParams>,
+  TParentParams
+> {
+  return (parent) =>
+    new QueryParamsEncoder(
+      // @ts-expect-error unsafe cast
+      parent,
+      options.params
+    );
 }
 
 class QueryParamsEncoder<TParams, TParentParams>
-  implements Encoder<Query, Partial<TParentParams & TParams>>
+  implements ParamsEncoder<Query, Partial<TParentParams & TParams>>
 {
   constructor(
-    private readonly parent: Encoder<Query, TParentParams>,
-    private readonly params: Encoders<TParams>
+    private readonly parent: ParamsEncoder<Query, TParentParams>,
+    private readonly params: Encoders<TParams> = {} as Encoders<TParams>
   ) {}
 
   encode(value: Partial<TParentParams & TParams>): EncoderResult<Query> {
@@ -42,7 +54,7 @@ class QueryParamsEncoder<TParams, TParentParams>
     }
   }
 
-  decode(value: Query): EncoderResult<Partial<TParentParams & TParams>> {
+  decode(value: Query): ParamsEncoderResult<Partial<TParentParams & TParams>> {
     const params: any = this.decodeQuery(value);
     if (this.parent !== undefined) {
       const parentResult = this.parent.decode(value);
@@ -52,11 +64,13 @@ class QueryParamsEncoder<TParams, TParentParams>
           ...parentResult.value,
           ...params,
         },
+        parent: parentResult,
       };
     } else {
       return {
         valid: true,
         value: params,
+        parent: undefined,
       };
     }
   }
