@@ -7,42 +7,42 @@ interface Place<TPath, TQuery, TFragment> {
 }
 
 export function createPlace<
-  TPath extends object,
+  TPathParams extends object,
+  TQueryParams,
+  TFragmentParams,
+  TPath,
   TQuery,
   TFragment,
-  TEncodedPath,
-  TEncodedQuery,
-  TEncodedFragment,
 >(
   route: Route<
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
     TPath,
     TQuery,
-    TFragment,
-    TEncodedPath,
-    TEncodedQuery,
-    TEncodedFragment
+    TFragment
   >,
   options: {
-    path: TPath;
-    query?: TQuery;
-    fragment?: TFragment;
+    path: TPathParams;
+    query?: TQueryParams;
+    fragment?: TFragmentParams;
   }
-): Place<TEncodedPath, TEncodedQuery, TEncodedFragment>;
+): Place<TPath, TQuery, TFragment>;
 export function createPlace<
-  TPath extends never,
+  TPathParams extends never,
+  TQueryParams,
+  TFragmentParams,
+  TPath,
   TQuery,
   TFragment,
-  TEncodedPath,
-  TEncodedQuery,
-  TEncodedFragment,
 >(
-  route: Route<TPath, TQuery, TFragment>,
+  route: Route<TPathParams, TQueryParams, TFragmentParams>,
   options?: {
-    path?: TPath;
-    query?: TQuery;
-    fragment?: TFragment;
+    path?: TPathParams;
+    query?: TQueryParams;
+    fragment?: TFragmentParams;
   }
-): Place<TEncodedPath, TEncodedQuery, TEncodedFragment>;
+): Place<TPath, TQuery, TFragment>;
 export function createPlace(
   route: Route<unknown, unknown, unknown>,
   options?: {
