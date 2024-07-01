@@ -7,7 +7,7 @@ interface Place<TPath, TQuery, TFragment> {
 }
 
 export function createPlace<
-  TPathParams extends object,
+  TPathParams extends Record<string, unknown>,
   TQueryParams,
   TFragmentParams,
   TPath,
@@ -29,7 +29,7 @@ export function createPlace<
   }
 ): Place<TPath, TQuery, TFragment>;
 export function createPlace<
-  TPathParams extends never,
+  TPathParams extends Record<string, never>,
   TQueryParams,
   TFragmentParams,
   TPath,

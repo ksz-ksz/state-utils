@@ -34,9 +34,9 @@ export interface Routing<
   fragmentEncoder: Encoder<string, TFragment>;
 
   createRoute: <
-    TParentPathParams = never,
-    TParentQueryParams = never,
-    TParentFragmentParams = never,
+    TParentPathParams = Record<string, never>,
+    TParentQueryParams = Record<string, never>,
+    TParentFragmentParams = Record<string, never>,
     TPathParams = TParentPathParams,
     TQueryParams = TParentQueryParams,
     TFragmentParams = TParentFragmentParams,

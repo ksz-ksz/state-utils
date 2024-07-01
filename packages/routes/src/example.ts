@@ -63,6 +63,7 @@ createPlace(baseRoute);
 createPlace(baseRoute, {});
 createPlace(baseRoute, {
   path: {
+    // @ts-expect-error options.path.x us unknown
     x: 1,
   },
 });
