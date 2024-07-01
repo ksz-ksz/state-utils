@@ -18,16 +18,19 @@ type InferParamName<TPathSegment> = TPathSegment extends `:${infer TParamName}`
 type InferParamNames<TPath extends string> = InferParamName<
   InferPathSegments<TPath>
 >;
-export type PathParams<TPath extends string> = {
-  [K in InferParamNames<TPath>]: unknown;
-};
+export type PathParams<TPath extends string> =
+  InferParamNames<TPath> extends never
+    ? Record<string, never>
+    : {
+        [K in InferParamNames<TPath>]: unknown;
+      };
 
 export function createPathParamsEncoderFactory<
   TPath extends string,
   TParams extends PathParams<TPath>,
   TParentParams,
 >(
-  options: object extends TParams
+  options: TParams extends Record<string, never>
     ? {
         path: TPath;
         params?: Encoders<TParams>;
@@ -37,6 +40,7 @@ export function createPathParamsEncoderFactory<
         params: Encoders<TParams>;
       }
 ): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
+  // @ts-expect-error unsafe encoder factory cast
   return (parent) => {
     return new PathParamsEncoder(
       // @ts-expect-error unsafe parent cast

@@ -8,10 +8,10 @@ import {
 } from './params-encoder';
 
 export function createQueryParamsEncoderFactory<
-  TParams,
-  TParentParams,
->(options: {
-  params: Encoders<TParams>;
+  TParams = Record<string, never>,
+  TParentParams = Record<string, never>,
+>(options?: {
+  params?: Encoders<TParams>;
 }): ParamsEncoderFactory<
   Query,
   Partial<TParentParams & TParams>,
@@ -21,7 +21,7 @@ export function createQueryParamsEncoderFactory<
     new QueryParamsEncoder(
       // @ts-expect-error unsafe cast
       parent,
-      options.params
+      options?.params ?? {}
     );
 }
 

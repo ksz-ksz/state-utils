@@ -57,13 +57,29 @@ const entityDetailsRoute = routing.createRoute({
   }),
 });
 
-const baseRoute = routing.createRoute({});
+// @ts-expect-error must provide encoders for root route
+routing.createRoute({});
+
+const baseRoute = routing.createRoute({
+  path: routing.path({
+    path: '',
+  }),
+  query: routing.query(),
+  fragment: routing.fragment(),
+});
 
 createPlace(baseRoute);
 createPlace(baseRoute, {});
 createPlace(baseRoute, {
   path: {
-    // @ts-expect-error options.path.x us unknown
+    // @ts-expect-error options.path.x is unknown
+    x: 1,
+  },
+});
+
+createPlace(baseRoute, {
+  query: {
+    // @ts-expect-error options.path.x is unknown
     x: 1,
   },
 });

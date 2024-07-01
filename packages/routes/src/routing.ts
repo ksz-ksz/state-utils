@@ -34,15 +34,28 @@ export interface Routing<
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
 
-  createRoute: <
-    TParentPathParams = Record<string, never>,
-    TParentQueryParams = Record<string, never>,
-    TParentFragmentParams = Record<string, never>,
+  createRoute<TPathParams, TQueryParams, TFragmentParams>(options: {
+    parent?: never;
+    path: ParamsEncoderFactory<TPath, TPathParams, unknown>;
+    query: ParamsEncoderFactory<TQuery, TQueryParams, unknown>;
+    fragment: ParamsEncoderFactory<TFragment, TFragmentParams, unknown>;
+  }): Route<
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
+    TQuery,
+    TFragment
+  >;
+  createRoute<
+    TParentPathParams,
+    TParentQueryParams,
+    TParentFragmentParams,
     TPathParams = TParentPathParams,
     TQueryParams = TParentQueryParams,
     TFragmentParams = TParentFragmentParams,
   >(options: {
-    parent?: Route<
+    parent: Route<
       TParentPathParams,
       TParentQueryParams,
       TParentFragmentParams,
@@ -57,7 +70,7 @@ export interface Routing<
       TFragmentParams,
       TParentFragmentParams
     >;
-  }) => Route<
+  }): Route<
     TPathParams,
     TQueryParams,
     TFragmentParams,
@@ -111,13 +124,22 @@ export function createRouting<
     pathEncoder: options.pathEncoder,
     queryEncoder: options.queryEncoder,
     fragmentEncoder: options.fragmentEncoder,
-    createRoute({ parent, path, query, fragment }) {
+    createRoute({ parent, path, query, fragment }: any) {
       return {
         id: routeId++,
         parent,
-        pathEncoder: getParamsEncoder(path, parent?.pathEncoder),
-        queryEncoder: getParamsEncoder(query, parent?.queryEncoder),
-        fragmentEncoder: getParamsEncoder(fragment, parent?.fragmentEncoder),
+        pathEncoder: getParamsEncoder(
+          path,
+          parent?.pathEncoder as ParamsEncoder<TPath, any>
+        ),
+        queryEncoder: getParamsEncoder(
+          query,
+          parent?.queryEncoder as ParamsEncoder<TQuery, any>
+        ),
+        fragmentEncoder: getParamsEncoder(
+          fragment,
+          parent?.fragmentEncoder as ParamsEncoder<TFragment, any>
+        ),
       };
     },
   };

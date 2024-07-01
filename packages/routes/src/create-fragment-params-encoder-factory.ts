@@ -1,37 +1,40 @@
 import { Fragment } from './fragment';
-import { Encoder, EncoderResult } from './encoder';
+import { Encoder, EncoderResult, ValidEncoderResult } from './encoder';
 import {
   ParamsEncoder,
   ParamsEncoderFactory,
   ParamsEncoderResult,
 } from './params-encoder';
 
-export function createFragmentParamsEncoderFactory<TParam>(options: {
-  param: Encoder<string, TParam>;
-}): ParamsEncoderFactory<Fragment, { value?: TParam }, unknown> {
-  return () => new FragmentParamsEncoder(options.param);
+export function createFragmentParamsEncoderFactory<
+  TParam = undefined,
+>(options?: {
+  param?: Encoder<string, TParam>;
+}): ParamsEncoderFactory<Fragment, TParam, unknown> {
+  return () => new FragmentParamsEncoder(options?.param);
 }
 
-class FragmentParamsEncoder<TParam>
-  implements ParamsEncoder<Fragment, { value?: TParam }>
-{
-  constructor(private readonly param: Encoder<string, TParam>) {}
+class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
+  constructor(private readonly param: Encoder<string, TParam> | undefined) {}
 
-  encode(value: { value?: TParam }): EncoderResult<Fragment> {
-    if (value?.value === undefined) {
-      return {
+  encode(value: TParam): EncoderResult<Fragment> {
+    return (
+      this.param?.encode(value) ?? {
         valid: true,
         value: '',
-      };
-    }
-    return this.param.encode(value.value);
+      }
+    );
   }
 
-  decode(value: Fragment): ParamsEncoderResult<{ value?: TParam }> {
-    const result = this.param.decode(value);
+  decode(value: Fragment): ParamsEncoderResult<TParam> {
+    const result =
+      this.param?.decode(value) ??
+      ({
+        valid: true,
+        value: undefined,
+      } as ValidEncoderResult<TParam>);
     return {
-      valid: result.valid,
-      value: { value: result.value },
+      ...result,
       parent: undefined,
     };
   }
