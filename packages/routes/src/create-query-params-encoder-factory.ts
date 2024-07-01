@@ -8,8 +8,8 @@ import {
 } from './params-encoder';
 
 export function createQueryParamsEncoderFactory<
-  TParams = Record<string, never>,
-  TParentParams = Record<string, never>,
+  TParams,
+  TParentParams,
 >(options?: {
   params?: Encoders<TParams>;
 }): ParamsEncoderFactory<

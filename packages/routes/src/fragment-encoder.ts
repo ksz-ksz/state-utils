@@ -9,7 +9,10 @@ class FragmentEncoder implements Encoder<string, Fragment> {
   encode(value: Fragment): EncoderResult<string> {
     return {
       valid: true,
-      value: value === '' ? '' : `#${encodeURIComponent(value)}`,
+      value:
+        value === undefined || value === ''
+          ? ''
+          : `#${encodeURIComponent(value)}`,
     };
   }
 

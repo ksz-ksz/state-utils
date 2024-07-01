@@ -20,7 +20,9 @@ type InferParamNames<TPath extends string> = InferParamName<
 >;
 export type PathParams<TPath extends string> =
   InferParamNames<TPath> extends never
-    ? Record<string, never>
+    ? {
+        [K in InferParamNames<TPath>]: never;
+      }
     : {
         [K in InferParamNames<TPath>]: unknown;
       };

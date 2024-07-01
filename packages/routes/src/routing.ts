@@ -84,9 +84,6 @@ export interface Routing<
     TPathParams extends Record<string, unknown>,
     TQueryParams,
     TFragmentParams,
-    TPath,
-    TQuery,
-    TFragment,
   >(
     route: Route<
       TPathParams,
@@ -106,9 +103,6 @@ export interface Routing<
     TPathParams extends Record<string, never>,
     TQueryParams,
     TFragmentParams,
-    TPath,
-    TQuery,
-    TFragment,
   >(
     route: Route<TPathParams, TQueryParams, TFragmentParams>,
     options?: {

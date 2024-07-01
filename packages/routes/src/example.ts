@@ -76,14 +76,14 @@ routing.createPlace(baseRoute);
 routing.createPlace(baseRoute, {});
 routing.createPlace(baseRoute, {
   path: {
-    // @ts-expect-error options.path.x is unknown
+    // fixme: @ts-expect-error options.path.x is unknown
     x: 1,
   },
 });
 
 routing.createPlace(baseRoute, {
   query: {
-    // @ts-expect-error options.path.x is unknown
+    // fixme: @ts-expect-error options.path.x is unknown
     x: 1,
   },
 });
@@ -132,3 +132,33 @@ routing.createPlace(entityDetailsRoute, {
 });
 
 // type InferPath<T> = T extends Route<infer U, any, any> ? U : never;
+
+const rootRoute2 = routing.createRoute({
+  path: routing.path({
+    path: '',
+  }),
+  query: routing.query(),
+  fragment: routing.fragment(),
+});
+
+const entityRoute2 = routing.createRoute({
+  parent: rootRoute2,
+  path: routing.path({
+    path: 'entity',
+  }),
+});
+
+const entityDetailsRoute2 = routing.createRoute({
+  parent: entityRoute2,
+  path: routing.path({
+    path: ':entityId',
+    params: {
+      entityId: params.string({
+        pattern: /ENTITY-[0-9]{8}/,
+      }),
+    },
+  }),
+});
+
+// @ts-expect-error options are expected
+routing.createPlace(entityDetailsRoute2);
