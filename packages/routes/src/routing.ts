@@ -3,6 +3,7 @@ import { Route } from './route';
 import { Historian } from './historian';
 import {
   CreateParamsEncoderFactory,
+  ParamsEncoder,
   ParamsEncoderFactory,
 } from './params-encoder';
 
@@ -114,10 +115,23 @@ export function createRouting<
       return {
         id: routeId++,
         parent,
-        pathEncoder: path?.(parent?.pathEncoder),
-        queryEncoder: query?.(parent?.queryEncoder),
-        fragmentEncoder: fragment?.(parent?.fragmentEncoder),
+        pathEncoder: getParamsEncoder(path, parent?.pathEncoder),
+        queryEncoder: getParamsEncoder(query, parent?.queryEncoder),
+        fragmentEncoder: getParamsEncoder(fragment, parent?.fragmentEncoder),
       };
     },
   };
+}
+
+function getParamsEncoder<TEncoded, TParams>(
+  encoderFactory?: ParamsEncoderFactory<TEncoded, TParams, any>,
+  parentEncoder?: ParamsEncoder<TEncoded, any>
+) {
+  if (encoderFactory !== undefined) {
+    return encoderFactory(parentEncoder);
+  }
+  if (parentEncoder !== undefined) {
+    return parentEncoder;
+  }
+  throw new Error(`Please provide encoders configuration for root route.`);
 }
