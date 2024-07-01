@@ -6,6 +6,7 @@ import {
   ParamsEncoder,
   ParamsEncoderFactory,
 } from './params-encoder';
+import { Place } from './place';
 
 export interface Routing<
   TPath,
@@ -78,6 +79,44 @@ export interface Routing<
     TQuery,
     TFragment
   >;
+
+  createPlace<
+    TPathParams extends Record<string, unknown>,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
+    TQuery,
+    TFragment,
+  >(
+    route: Route<
+      TPathParams,
+      TQueryParams,
+      TFragmentParams,
+      TPath,
+      TQuery,
+      TFragment
+    >,
+    options: {
+      path: TPathParams;
+      query?: TQueryParams;
+      fragment?: TFragmentParams;
+    }
+  ): Place<TPath, TQuery, TFragment>;
+  createPlace<
+    TPathParams extends Record<string, never>,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
+    TQuery,
+    TFragment,
+  >(
+    route: Route<TPathParams, TQueryParams, TFragmentParams>,
+    options?: {
+      path?: TPathParams;
+      query?: TQueryParams;
+      fragment?: TFragmentParams;
+    }
+  ): Place<TPath, TQuery, TFragment>;
 }
 
 export function createRouting<
@@ -107,6 +146,7 @@ export function createRouting<
   pathParamsEncoderFactory: TPathParamsEncoderFactory;
   queryParamsEncoderFactory: TQueryParamsEncoderFactory;
   fragmentParamsEncoderFactory: TFragmentParamsEncoderFactory;
+  defaultPlace: Place<TPath, TQuery, TFragment>;
 }): Routing<
   TPath,
   TQuery,
@@ -117,13 +157,23 @@ export function createRouting<
 > {
   let routeId = 0;
 
+  const {
+    pathParamsEncoderFactory,
+    queryParamsEncoderFactory,
+    fragmentParamsEncoderFactory,
+    pathEncoder,
+    queryEncoder,
+    fragmentEncoder,
+    defaultPlace,
+  } = options;
+
   return {
-    path: options.pathParamsEncoderFactory,
-    query: options.queryParamsEncoderFactory,
-    fragment: options.fragmentParamsEncoderFactory,
-    pathEncoder: options.pathEncoder,
-    queryEncoder: options.queryEncoder,
-    fragmentEncoder: options.fragmentEncoder,
+    path: pathParamsEncoderFactory,
+    query: queryParamsEncoderFactory,
+    fragment: fragmentParamsEncoderFactory,
+    pathEncoder: pathEncoder,
+    queryEncoder: queryEncoder,
+    fragmentEncoder: fragmentEncoder,
     createRoute({ parent, path, query, fragment }: any) {
       return {
         id: routeId++,
@@ -140,6 +190,29 @@ export function createRouting<
           fragment,
           parent?.fragmentEncoder as ParamsEncoder<TFragment, any>
         ),
+      };
+    },
+    createPlace(
+      route: Route<unknown, unknown, unknown, TPath, TQuery, TFragment>,
+      { path, query, fragment }: any
+    ): Place<TPath, TQuery, TFragment> {
+      const pathResult = route.pathEncoder.encode(path);
+      if (!pathResult.valid) {
+        return defaultPlace;
+      }
+      const queryResult = route.queryEncoder.encode(query);
+      if (!queryResult.valid) {
+        return defaultPlace;
+      }
+      const fragmentResult = route.fragmentEncoder.encode(fragment);
+      if (!fragmentResult.valid) {
+        return defaultPlace;
+      }
+
+      return {
+        path: pathResult.value,
+        query: queryResult.value,
+        fragment: fragmentResult.value,
       };
     },
   };

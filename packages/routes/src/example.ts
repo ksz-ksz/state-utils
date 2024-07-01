@@ -3,7 +3,6 @@ import { createBrowserHistorian } from './browser-historian';
 import { createPathParamsEncoderFactory } from './create-path-params-encoder-factory';
 import { createQueryParamsEncoderFactory } from './create-query-params-encoder-factory';
 import { createFragmentParamsEncoderFactory } from './create-fragment-params-encoder-factory';
-import { createPlace } from './place';
 import { params } from './params';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
@@ -17,6 +16,11 @@ const routing = createRouting({
   pathParamsEncoderFactory: createPathParamsEncoderFactory,
   queryParamsEncoderFactory: createQueryParamsEncoderFactory,
   fragmentParamsEncoderFactory: createFragmentParamsEncoderFactory,
+  defaultPlace: {
+    path: [],
+    query: {},
+    fragment: undefined,
+  },
 });
 
 const rootRoute = routing.createRoute({
@@ -68,16 +72,16 @@ const baseRoute = routing.createRoute({
   fragment: routing.fragment(),
 });
 
-createPlace(baseRoute);
-createPlace(baseRoute, {});
-createPlace(baseRoute, {
+routing.createPlace(baseRoute);
+routing.createPlace(baseRoute, {});
+routing.createPlace(baseRoute, {
   path: {
     // @ts-expect-error options.path.x is unknown
     x: 1,
   },
 });
 
-createPlace(baseRoute, {
+routing.createPlace(baseRoute, {
   query: {
     // @ts-expect-error options.path.x is unknown
     x: 1,
@@ -85,13 +89,13 @@ createPlace(baseRoute, {
 });
 
 // @ts-expect-error options must be provided
-createPlace(entityRoute);
+routing.createPlace(entityRoute);
 
 // @ts-expect-error options.path must be provided
-createPlace(entityRoute, {});
+routing.createPlace(entityRoute, {});
 
 // @ts-expect-error options.path.x is unknown
-createPlace(entityRoute, {
+routing.createPlace(entityRoute, {
   path: {
     x: 1,
     pathParamBase: 1,
@@ -99,7 +103,7 @@ createPlace(entityRoute, {
 });
 
 // @ts-expect-error options.path.x is unknown
-createPlace(entityDetailsRoute, {
+routing.createPlace(entityDetailsRoute, {
   path: {
     x: 1,
     pathParamBase: 1,
@@ -107,7 +111,7 @@ createPlace(entityDetailsRoute, {
   },
 });
 
-createPlace(entityRoute, {
+routing.createPlace(entityRoute, {
   path: {
     pathParamBase: 1,
   },
@@ -116,7 +120,7 @@ createPlace(entityRoute, {
   },
 });
 
-createPlace(entityDetailsRoute, {
+routing.createPlace(entityDetailsRoute, {
   path: {
     pathParamBase: 1,
     entityId: '2',

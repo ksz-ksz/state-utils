@@ -21,14 +21,14 @@ class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
     return (
       this.param?.encode(value) ?? {
         valid: true,
-        value: '',
+        value: undefined,
       }
     );
   }
 
   decode(value: Fragment): ParamsEncoderResult<TParam> {
     const result =
-      this.param?.decode(value) ??
+      this.param?.decode(value ?? '') ??
       ({
         valid: true,
         value: undefined,

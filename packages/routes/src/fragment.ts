@@ -1,1 +1,1 @@
-export type Fragment = string;
+export type Fragment = string | undefined;
