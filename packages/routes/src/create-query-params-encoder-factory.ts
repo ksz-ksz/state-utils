@@ -11,7 +11,7 @@ export function createQueryParamsEncoderFactory<
   TParams,
   TParentParams,
 >(options: {
-  params?: Encoders<TParams>;
+  params: Encoders<TParams>;
 }): ParamsEncoderFactory<
   Query,
   Partial<TParentParams & TParams>,

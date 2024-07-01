@@ -8,20 +8,30 @@ import {
 
 export function createFragmentParamsEncoderFactory<TParam>(options: {
   param: Encoder<string, TParam>;
-}): ParamsEncoderFactory<Fragment, TParam, unknown> {
+}): ParamsEncoderFactory<Fragment, { value?: TParam }, unknown> {
   return () => new FragmentParamsEncoder(options.param);
 }
 
-class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
+class FragmentParamsEncoder<TParam>
+  implements ParamsEncoder<Fragment, { value?: TParam }>
+{
   constructor(private readonly param: Encoder<string, TParam>) {}
 
-  encode(value: TParam): EncoderResult<Fragment> {
-    return this.param.encode(value);
+  encode(value: { value?: TParam }): EncoderResult<Fragment> {
+    if (value?.value === undefined) {
+      return {
+        valid: true,
+        value: '',
+      };
+    }
+    return this.param.encode(value.value);
   }
 
-  decode(value: Fragment): ParamsEncoderResult<TParam> {
+  decode(value: Fragment): ParamsEncoderResult<{ value?: TParam }> {
+    const result = this.param.decode(value);
     return {
-      ...this.param.decode(value),
+      valid: result.valid,
+      value: { value: result.value },
       parent: undefined,
     };
   }
