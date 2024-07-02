@@ -17,12 +17,12 @@ export function createQueryParamsEncoderFactory<
   Partial<TParentParams & TParams>,
   TParentParams
 > {
-  return (parent) =>
-    new QueryParamsEncoder(
-      // @ts-expect-error unsafe cast
-      parent,
-      options?.params ?? {}
-    );
+  return (parent) => {
+    if (parent !== undefined && !(parent instanceof QueryParamsEncoder)) {
+      throw new Error('Parent must be an instance of QueryParamsEncoder');
+    }
+    return new QueryParamsEncoder(parent, options?.params);
+  };
 }
 
 export const query = createQueryParamsEncoderFactory;
@@ -31,7 +31,7 @@ class QueryParamsEncoder<TParams, TParentParams>
   implements ParamsEncoder<Query, Partial<TParentParams & TParams>>
 {
   constructor(
-    private readonly parent: ParamsEncoder<Query, TParentParams>,
+    private readonly parent: ParamsEncoder<Query, TParentParams> | undefined,
     private readonly params: Encoders<TParams> = {} as Encoders<TParams>
   ) {}
 

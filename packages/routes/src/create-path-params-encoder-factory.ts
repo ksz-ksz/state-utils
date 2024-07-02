@@ -42,10 +42,11 @@ export function createPathParamsEncoderFactory<
         params: Encoders<TParams>;
       }
 ): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
-  // @ts-expect-error unsafe encoder factory cast
   return (parent) => {
+    if (parent !== undefined && !(parent instanceof PathParamsEncoder)) {
+      throw new Error('Parent must be an instance of PathParamsEncoder');
+    }
     return new PathParamsEncoder(
-      // @ts-expect-error unsafe parent cast
       parent,
       parsePath(options.path),
       options.params
