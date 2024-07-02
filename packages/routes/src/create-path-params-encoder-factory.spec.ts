@@ -1,14 +1,11 @@
-import { createPathParamsEncoderFactory } from './create-path-params-encoder-factory';
+import { createPath } from './create-path-params-encoder-factory';
 import { params } from './params';
 
 describe('create-path-params-encoder-factory', () => {
   describe('decode', () => {
     it('should decode', () => {
-      const encoderFactory = createPathParamsEncoderFactory({
-        path: 'hello/:foo',
-        params: {
-          foo: params.string(),
-        },
+      const encoderFactory = createPath('hello/:foo', {
+        foo: params.string(),
       });
       const encoder = encoderFactory();
 
@@ -27,17 +24,11 @@ describe('create-path-params-encoder-factory', () => {
     });
 
     it('should decode with parent', () => {
-      const parentEncoderFactory = createPathParamsEncoderFactory({
-        path: 'hello/:foo',
-        params: {
-          foo: params.string(),
-        },
+      const parentEncoderFactory = createPath('hello/:foo', {
+        foo: params.string(),
       });
-      const encoderFactory = createPathParamsEncoderFactory({
-        path: 'hi/:bar',
-        params: {
-          bar: params.number(),
-        },
+      const encoderFactory = createPath('hi/:bar', {
+        bar: params.number(),
       });
       const parentEncoder = parentEncoderFactory();
       const encoder = encoderFactory(parentEncoder);
@@ -65,11 +56,8 @@ describe('create-path-params-encoder-factory', () => {
     });
 
     it('should not decode if path is invalid', () => {
-      const encoderFactory = createPathParamsEncoderFactory({
-        path: 'hello/:foo',
-        params: {
-          foo: params.string(),
-        },
+      const encoderFactory = createPath('hello/:foo', {
+        foo: params.string(),
       });
       const encoder = encoderFactory();
 
@@ -85,13 +73,10 @@ describe('create-path-params-encoder-factory', () => {
     });
 
     it('should not decode if path-param is invalid', () => {
-      const encoderFactory = createPathParamsEncoderFactory({
-        path: 'hello/:foo',
-        params: {
-          foo: params.string({
-            pattern: /oops/,
-          }),
-        },
+      const encoderFactory = createPath('hello/:foo', {
+        foo: params.string({
+          pattern: /oops/,
+        }),
       });
       const encoder = encoderFactory();
 
@@ -109,11 +94,8 @@ describe('create-path-params-encoder-factory', () => {
 
   describe('encode', () => {
     it('should encode', () => {
-      const encoderFactory = createPathParamsEncoderFactory({
-        path: 'hello/:foo',
-        params: {
-          foo: params.string(),
-        },
+      const encoderFactory = createPath('hello/:foo', {
+        foo: params.string(),
       });
       const encoder = encoderFactory();
 
@@ -134,17 +116,11 @@ describe('create-path-params-encoder-factory', () => {
   });
 
   it('should encode with parent', () => {
-    const parentEncoderFactory = createPathParamsEncoderFactory({
-      path: 'hello/:foo',
-      params: {
-        foo: params.string(),
-      },
+    const parentEncoderFactory = createPath('hello/:foo', {
+      foo: params.string(),
     });
-    const encoderFactory = createPathParamsEncoderFactory({
-      path: 'hi/:bar',
-      params: {
-        bar: params.string(),
-      },
+    const encoderFactory = createPath('hi/:bar', {
+      bar: params.string(),
     });
     const parentEncoder = parentEncoderFactory();
     const encoder = encoderFactory(parentEncoder);
@@ -169,13 +145,10 @@ describe('create-path-params-encoder-factory', () => {
   });
 
   it('should not encode if path-param is invalid', () => {
-    const encoderFactory = createPathParamsEncoderFactory({
-      path: 'hello/:foo',
-      params: {
-        foo: params.string({
-          pattern: /oops/,
-        }),
-      },
+    const encoderFactory = createPath('hello/:foo', {
+      foo: params.string({
+        pattern: /oops/,
+      }),
     });
     const encoder = encoderFactory();
 

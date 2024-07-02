@@ -33,47 +33,16 @@ export function createPath<
   TParentParams,
 >(
   ...[path, params]: TParams extends Record<string, never>
-    ? [path: TPath, params?: TParams]
-    : [path: TPath, params: TParams]
+    ? [path: TPath, params?: Encoders<TParams>]
+    : [path: TPath, params: Encoders<TParams>]
 ): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
   return (parent) => {
     if (parent !== undefined && !(parent instanceof PathParamsEncoder)) {
       throw new Error('Parent must be an instance of PathParamsEncoder');
     }
-    // @ts-expect-error unsafe cast
     return new PathParamsEncoder(parent, parsePath(path), params);
   };
 }
-
-export function createPathParamsEncoderFactory<
-  TPath extends string,
-  TParams extends PathParams<TPath>,
-  TParentParams,
->(
-  options: TParams extends Record<string, never>
-    ? {
-        path: TPath;
-        params?: Encoders<TParams>;
-      }
-    : {
-        path: TPath;
-        params: Encoders<TParams>;
-      }
-): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
-  return (parent) => {
-    if (parent !== undefined && !(parent instanceof PathParamsEncoder)) {
-      throw new Error('Parent must be an instance of PathParamsEncoder');
-    }
-    return new PathParamsEncoder(
-      parent,
-      parsePath(options.path),
-      options.params
-    );
-  };
-}
-
-export const path = createPathParamsEncoderFactory;
-
 interface PathSegment {
   type: 'path';
   name: string;

@@ -1,8 +1,8 @@
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
-import { createPath, path } from './create-path-params-encoder-factory';
-import { query } from './create-query-params-encoder-factory';
-import { fragment } from './create-fragment-params-encoder-factory';
+import { createPath } from './create-path-params-encoder-factory';
+import { createQuery } from './create-query-params-encoder-factory';
+import { createFragment } from './create-fragment-params-encoder-factory';
 import { params } from './params';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
@@ -29,40 +29,28 @@ createPath(':c', {
 });
 
 const rootRoute = routing.createRoute({
-  path: path({
-    path: ':pathParamBase',
-    params: {
-      pathParamBase: params.number(),
-    },
+  path: createPath(':pathParamBase', {
+    pathParamBase: params.number(),
   }),
-  query: query({
-    params: {
-      queryParamBase: params.string(),
-    },
+  query: createQuery({
+    queryParamBase: params.string(),
   }),
-  fragment: fragment({
-    param: params.string(),
-  }),
+  fragment: createFragment(params.string()),
 });
 
 const entityRoute = routing.createRoute({
   parent: rootRoute,
-  query: query({
-    params: {
-      baz: params.string(),
-    },
+  query: createQuery({
+    baz: params.string(),
   }),
 });
 
 const entityDetailsRoute = routing.createRoute({
   parent: entityRoute,
-  path: path({
-    path: ':entityId',
-    params: {
-      entityId: params.string({
-        pattern: /ENTITY-[0-9]{16}/,
-      }),
-    },
+  path: createPath(':entityId', {
+    entityId: params.string({
+      pattern: /ENTITY-[0-9]{16}/,
+    }),
   }),
 });
 
@@ -70,11 +58,9 @@ const entityDetailsRoute = routing.createRoute({
 routing.createRoute({});
 
 const baseRoute = routing.createRoute({
-  path: path({
-    path: '',
-  }),
-  query: query(),
-  fragment: fragment(),
+  path: createPath(''),
+  query: createQuery(),
+  fragment: createFragment(),
 });
 
 routing.createPlace(baseRoute);
@@ -139,29 +125,22 @@ routing.createPlace(entityDetailsRoute, {
 // type InferPath<T> = T extends Route<infer U, any, any> ? U : never;
 
 const rootRoute2 = routing.createRoute({
-  path: path({
-    path: '',
-  }),
-  query: query(),
-  fragment: fragment(),
+  path: createPath(''),
+  query: createQuery(),
+  fragment: createFragment(),
 });
 
 const entityRoute2 = routing.createRoute({
   parent: rootRoute2,
-  path: path({
-    path: 'entity',
-  }),
+  path: createPath('entity'),
 });
 
 const entityDetailsRoute2 = routing.createRoute({
   parent: entityRoute2,
-  path: path({
-    path: ':entityId',
-    params: {
-      entityId: params.string({
-        pattern: /ENTITY-[0-9]{8}/,
-      }),
-    },
+  path: createPath(':entityId', {
+    entityId: params.string({
+      pattern: /ENTITY-[0-9]{8}/,
+    }),
   }),
 });
 

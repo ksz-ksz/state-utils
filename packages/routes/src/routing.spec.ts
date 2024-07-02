@@ -3,9 +3,9 @@ import { createBrowserHistorian } from './browser-historian';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
 import { createFragmentEncoder } from './fragment-encoder';
-import { path } from './create-path-params-encoder-factory';
-import { query } from './create-query-params-encoder-factory';
-import { fragment } from './create-fragment-params-encoder-factory';
+import { createPath } from './create-path-params-encoder-factory';
+import { createQuery } from './create-query-params-encoder-factory';
+import { createFragment } from './create-fragment-params-encoder-factory';
 import { params } from './params';
 
 function createTestHarness() {
@@ -22,42 +22,33 @@ function createTestHarness() {
   });
 
   const rootRoute = routing.createRoute({
-    path: path({
-      path: '',
-    }),
-    query: query(),
-    fragment: fragment(),
+    path: createPath(''),
+    query: createQuery(),
+    fragment: createFragment(),
   });
 
   const testParentRoute = routing.createRoute({
     parent: rootRoute,
-    path: path({
-      path: 'test',
-    }),
+    path: createPath('test'),
   });
 
   const testRoute = routing.createRoute({
     parent: testParentRoute,
-    path: path({
-      path: ':pathParam',
-      params: {
-        pathParam: params.string({
-          pattern: /^valid-path-param$/,
-        }),
-      },
-    }),
-    query: query({
-      params: {
-        queryParam: params.string({
-          pattern: /^valid-query-param$/,
-        }),
-      },
-    }),
-    fragment: fragment({
-      param: params.string({
-        pattern: /^valid-fragment$/,
+    path: createPath(':pathParam', {
+      pathParam: params.string({
+        pattern: /^valid-path-param$/,
       }),
     }),
+    query: createQuery({
+      queryParam: params.string({
+        pattern: /^valid-query-param$/,
+      }),
+    }),
+    fragment: createFragment(
+      params.string({
+        pattern: /^valid-fragment$/,
+      })
+    ),
   });
   return { routing, testRoute };
 }

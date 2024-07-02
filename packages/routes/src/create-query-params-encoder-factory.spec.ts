@@ -1,13 +1,11 @@
-import { createQueryParamsEncoderFactory } from './create-query-params-encoder-factory';
+import { createQuery } from './create-query-params-encoder-factory';
 import { params } from './params';
 
 describe('create-query-params-encoder-factory', () => {
   describe('decode', () => {
     it('should decode', () => {
-      const encoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          foo: params.string(),
-        },
+      const encoderFactory = createQuery({
+        foo: params.string(),
       });
       const encoder = encoderFactory();
 
@@ -26,15 +24,11 @@ describe('create-query-params-encoder-factory', () => {
 `);
     });
     it('should decode with parent', () => {
-      const parentEncoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          foo: params.string(),
-        },
+      const parentEncoderFactory = createQuery({
+        foo: params.string(),
       });
-      const encoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          bar: params.number(),
-        },
+      const encoderFactory = createQuery({
+        bar: params.number(),
       });
       const parentEncoder = parentEncoderFactory();
       const encoder = encoderFactory(parentEncoder);
@@ -65,10 +59,8 @@ describe('create-query-params-encoder-factory', () => {
 
   describe('encode', () => {
     it('should encode', () => {
-      const encoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          foo: params.string(),
-        },
+      const encoderFactory = createQuery({
+        foo: params.string(),
       });
       const encoder = encoderFactory();
 
@@ -87,15 +79,11 @@ describe('create-query-params-encoder-factory', () => {
     });
 
     it('should encode with parent', () => {
-      const parentEncoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          foo: params.string(),
-        },
+      const parentEncoderFactory = createQuery({
+        foo: params.string(),
       });
-      const encoderFactory = createQueryParamsEncoderFactory({
-        params: {
-          bar: params.number(),
-        },
+      const encoderFactory = createQuery({
+        bar: params.number(),
       });
       const parentEncoder = parentEncoderFactory();
       const encoder = encoderFactory(parentEncoder);
