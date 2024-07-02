@@ -25,6 +25,8 @@ export function createQueryParamsEncoderFactory<
     );
 }
 
+export const query = createQueryParamsEncoderFactory;
+
 class QueryParamsEncoder<TParams, TParentParams>
   implements ParamsEncoder<Query, Partial<TParentParams & TParams>>
 {

@@ -53,6 +53,8 @@ export function createPathParamsEncoderFactory<
   };
 }
 
+export const path = createPathParamsEncoderFactory;
+
 interface PathSegment {
   type: 'path';
   name: string;

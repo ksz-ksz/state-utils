@@ -14,6 +14,8 @@ export function createFragmentParamsEncoderFactory<
   return () => new FragmentParamsEncoder(options?.param);
 }
 
+export const fragment = createFragmentParamsEncoderFactory;
+
 class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
   constructor(private readonly param: Encoder<string, TParam> | undefined) {}
 

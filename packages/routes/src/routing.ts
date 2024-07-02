@@ -1,36 +1,10 @@
 import { Encoder } from './encoder';
 import { Route } from './route';
 import { Historian } from './historian';
-import {
-  CreateParamsEncoderFactory,
-  ParamsEncoder,
-  ParamsEncoderFactory,
-} from './params-encoder';
+import { ParamsEncoder, ParamsEncoderFactory } from './params-encoder';
 import { Place } from './place';
 
-export interface Routing<
-  TPath,
-  TQuery,
-  TFragment,
-  TPathParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TPath,
-    unknown,
-    unknown
-  >,
-  TQueryParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TQuery,
-    unknown,
-    unknown
-  >,
-  TFragmentParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TFragment,
-    unknown,
-    unknown
-  >,
-> {
-  path: TPathParamsEncoderFactory;
-  query: TQueryParamsEncoderFactory;
-  fragment: TFragmentParamsEncoderFactory;
+export interface Routing<TPath, TQuery, TFragment> {
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
@@ -113,58 +87,18 @@ export interface Routing<
   ): Place<TPath, TQuery, TFragment>;
 }
 
-export function createRouting<
-  TPath,
-  TQuery,
-  TFragment,
-  TPathParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TPath,
-    unknown,
-    unknown
-  >,
-  TQueryParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TQuery,
-    unknown,
-    unknown
-  >,
-  TFragmentParamsEncoderFactory extends CreateParamsEncoderFactory<
-    TFragment,
-    unknown,
-    unknown
-  >,
->(options: {
+export function createRouting<TPath, TQuery, TFragment>(options: {
   historian: Historian;
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
-  pathParamsEncoderFactory: TPathParamsEncoderFactory;
-  queryParamsEncoderFactory: TQueryParamsEncoderFactory;
-  fragmentParamsEncoderFactory: TFragmentParamsEncoderFactory;
   defaultPlace: Place<TPath, TQuery, TFragment>;
-}): Routing<
-  TPath,
-  TQuery,
-  TFragment,
-  TPathParamsEncoderFactory,
-  TQueryParamsEncoderFactory,
-  TFragmentParamsEncoderFactory
-> {
+}): Routing<TPath, TQuery, TFragment> {
   let routeId = 0;
 
-  const {
-    pathParamsEncoderFactory,
-    queryParamsEncoderFactory,
-    fragmentParamsEncoderFactory,
-    pathEncoder,
-    queryEncoder,
-    fragmentEncoder,
-    defaultPlace,
-  } = options;
+  const { pathEncoder, queryEncoder, fragmentEncoder, defaultPlace } = options;
 
   return {
-    path: pathParamsEncoderFactory,
-    query: queryParamsEncoderFactory,
-    fragment: fragmentParamsEncoderFactory,
     pathEncoder: pathEncoder,
     queryEncoder: queryEncoder,
     fragmentEncoder: fragmentEncoder,

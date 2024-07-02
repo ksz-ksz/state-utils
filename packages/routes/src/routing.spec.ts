@@ -3,9 +3,9 @@ import { createBrowserHistorian } from './browser-historian';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
 import { createFragmentEncoder } from './fragment-encoder';
-import { createPathParamsEncoderFactory } from './create-path-params-encoder-factory';
-import { createQueryParamsEncoderFactory } from './create-query-params-encoder-factory';
-import { createFragmentParamsEncoderFactory } from './create-fragment-params-encoder-factory';
+import { path } from './create-path-params-encoder-factory';
+import { query } from './create-query-params-encoder-factory';
+import { fragment } from './create-fragment-params-encoder-factory';
 import { params } from './params';
 
 function createTestRouting() {
@@ -14,9 +14,6 @@ function createTestRouting() {
     pathEncoder: createPathEncoder(),
     queryEncoder: createQueryEncoder(),
     fragmentEncoder: createFragmentEncoder(),
-    pathParamsEncoderFactory: createPathParamsEncoderFactory,
-    queryParamsEncoderFactory: createQueryParamsEncoderFactory,
-    fragmentParamsEncoderFactory: createFragmentParamsEncoderFactory,
     defaultPlace: {
       path: [],
       query: {},
@@ -31,34 +28,34 @@ describe('routing', () => {
       const routing = createTestRouting();
 
       const rootRoute = routing.createRoute({
-        path: routing.path({
+        path: path({
           path: '',
         }),
-        query: routing.query(),
-        fragment: routing.fragment(),
+        query: query(),
+        fragment: fragment(),
       });
 
       const entityRoute = routing.createRoute({
         parent: rootRoute,
-        path: routing.path({
+        path: path({
           path: 'book',
         }),
       });
 
       const entityDetailsRoute = routing.createRoute({
         parent: entityRoute,
-        path: routing.path({
+        path: path({
           path: ':bookId',
           params: {
             bookId: params.string(),
           },
         }),
-        query: routing.query({
+        query: query({
           params: {
             foo: params.number(),
           },
         }),
-        fragment: routing.fragment({
+        fragment: fragment({
           param: params.boolean(),
         }),
       });

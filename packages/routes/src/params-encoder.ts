@@ -18,7 +18,3 @@ export interface ParamsEncoderFactory<TEncoded, TParams, TParentParams> {
     parent?: ParamsEncoder<TEncoded, TParentParams>
   ): ParamsEncoder<TEncoded, TParams>;
 }
-
-export interface CreateParamsEncoderFactory<TEncoded, TParams, TParentParams> {
-  (...args: any[]): ParamsEncoderFactory<TEncoded, TParams, TParentParams>;
-}
