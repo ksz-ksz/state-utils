@@ -7,6 +7,21 @@ import {
   ParamsEncoderResult,
 } from './params-encoder';
 
+export function createQuery<TParams, TParentParams>(
+  params?: Encoders<TParams>
+): ParamsEncoderFactory<
+  Query,
+  Partial<TParentParams & TParams>,
+  TParentParams
+> {
+  return (parent) => {
+    if (parent !== undefined && !(parent instanceof QueryParamsEncoder)) {
+      throw new Error('Parent must be an instance of QueryParamsEncoder');
+    }
+    return new QueryParamsEncoder(parent, params);
+  };
+}
+
 export function createQueryParamsEncoderFactory<
   TParams,
   TParentParams,

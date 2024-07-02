@@ -27,6 +27,24 @@ export type PathParams<TPath extends string> =
         [K in InferParamNames<TPath>]: unknown;
       };
 
+export function createPath<
+  TPath extends string,
+  TParams extends PathParams<TPath>,
+  TParentParams,
+>(
+  ...[path, params]: TParams extends Record<string, never>
+    ? [path: TPath, params?: TParams]
+    : [path: TPath, params: TParams]
+): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
+  return (parent) => {
+    if (parent !== undefined && !(parent instanceof PathParamsEncoder)) {
+      throw new Error('Parent must be an instance of PathParamsEncoder');
+    }
+    // @ts-expect-error unsafe cast
+    return new PathParamsEncoder(parent, parsePath(path), params);
+  };
+}
+
 export function createPathParamsEncoderFactory<
   TPath extends string,
   TParams extends PathParams<TPath>,

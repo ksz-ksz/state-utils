@@ -1,6 +1,6 @@
 import { createRouting } from './routing';
 import { createBrowserHistorian } from './browser-historian';
-import { path } from './create-path-params-encoder-factory';
+import { createPath, path } from './create-path-params-encoder-factory';
 import { query } from './create-query-params-encoder-factory';
 import { fragment } from './create-fragment-params-encoder-factory';
 import { params } from './params';
@@ -18,6 +18,14 @@ const routing = createRouting({
     query: {},
     fragment: undefined,
   },
+});
+
+createPath(':a', {
+  a: params.string(),
+});
+
+createPath(':c', {
+  c: params.string(),
 });
 
 const rootRoute = routing.createRoute({

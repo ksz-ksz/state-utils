@@ -6,6 +6,12 @@ import {
   ParamsEncoderResult,
 } from './params-encoder';
 
+export function createFragment<TParam = undefined>(
+  param?: Encoder<string, TParam>
+): ParamsEncoderFactory<Fragment, TParam, unknown> {
+  return () => new FragmentParamsEncoder(param);
+}
+
 export function createFragmentParamsEncoderFactory<
   TParam = undefined,
 >(options?: {
