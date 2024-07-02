@@ -63,6 +63,48 @@ describe('create-path-params-encoder-factory', () => {
 }
 `);
     });
+
+    it('should not decode if path is invalid', () => {
+      const encoderFactory = createPathParamsEncoderFactory({
+        path: 'hello/:foo',
+        params: {
+          foo: params.string(),
+        },
+      });
+      const encoder = encoderFactory();
+
+      const result = encoder.decode(['hi', 'fooVal']);
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "consumed": -1,
+  "parent": undefined,
+  "valid": false,
+}
+`);
+    });
+
+    it('should not decode if path-param is invalid', () => {
+      const encoderFactory = createPathParamsEncoderFactory({
+        path: 'hello/:foo',
+        params: {
+          foo: params.string({
+            pattern: /oops/,
+          }),
+        },
+      });
+      const encoder = encoderFactory();
+
+      const result = encoder.decode(['hello', 'fooVal']);
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "consumed": -1,
+  "parent": undefined,
+  "valid": false,
+}
+`);
+    });
   });
 
   describe('encode', () => {
@@ -122,6 +164,28 @@ describe('create-path-params-encoder-factory', () => {
     "hi",
     "barVal",
   ],
+}
+`);
+  });
+
+  it('should not encode if path-param is invalid', () => {
+    const encoderFactory = createPathParamsEncoderFactory({
+      path: 'hello/:foo',
+      params: {
+        foo: params.string({
+          pattern: /oops/,
+        }),
+      },
+    });
+    const encoder = encoderFactory();
+
+    const result = encoder.encode({
+      foo: 'fooVal',
+    });
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "valid": false,
 }
 `);
   });
