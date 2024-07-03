@@ -3,8 +3,10 @@ import { Route } from './route';
 import { Historian } from './historian';
 import { ParamsEncoder, ParamsEncoderFactory } from './params-encoder';
 import { Place } from './place';
+import { RouteConfig } from './route-config';
+import { RoutingRule } from './routing-rule';
 
-export interface Routing<TPath, TQuery, TFragment> {
+export interface Routing<TData, TPath, TQuery, TFragment> {
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
@@ -54,6 +56,46 @@ export interface Routing<TPath, TQuery, TFragment> {
     TFragment
   >;
 
+  createRouteConfig<TPathParams, TQueryParams, TFragmentParams>(
+    route: Route<
+      TPathParams,
+      TQueryParams,
+      TFragmentParams,
+      TPath,
+      TQuery,
+      TFragment
+    >,
+    options: {
+      data?: TData;
+      rules?: RoutingRule<
+        TData,
+        TPathParams,
+        TQueryParams,
+        TFragmentParams,
+        TPath,
+        TQuery,
+        TFragment
+      >[];
+      children?: RouteConfig<
+        TData,
+        unknown,
+        unknown,
+        unknown,
+        TPath,
+        TQuery,
+        TFragment
+      >[];
+    }
+  ): RouteConfig<
+    TData,
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
+    TQuery,
+    TFragment
+  >;
+
   createPlace<
     TPathParams extends Record<string, unknown>,
     TQueryParams,
@@ -87,16 +129,23 @@ export interface Routing<TPath, TQuery, TFragment> {
   ): Place<TPath, TQuery, TFragment>;
 }
 
-export function createRouting<TPath, TQuery, TFragment>(options: {
+export function createRouting<TData, TPath, TQuery, TFragment>(options: {
   historian: Historian;
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
+  defaultData: TData;
   defaultPlace: Place<TPath, TQuery, TFragment>;
-}): Routing<TPath, TQuery, TFragment> {
+}): Routing<TData, TPath, TQuery, TFragment> {
   let routeId = 0;
 
-  const { pathEncoder, queryEncoder, fragmentEncoder, defaultPlace } = options;
+  const {
+    pathEncoder,
+    queryEncoder,
+    fragmentEncoder,
+    defaultData,
+    defaultPlace,
+  } = options;
 
   return {
     pathEncoder: pathEncoder,
@@ -118,6 +167,56 @@ export function createRouting<TPath, TQuery, TFragment>(options: {
           fragment,
           parent?.fragmentEncoder as ParamsEncoder<TFragment, any>
         ),
+      };
+    },
+    createRouteConfig<TPathParams, TQueryParams, TFragmentParams>(
+      route: Route<
+        TPathParams,
+        TQueryParams,
+        TFragmentParams,
+        TPath,
+        TQuery,
+        TFragment
+      >,
+      {
+        data = defaultData,
+        rules = [],
+        children = [],
+      }: {
+        data?: TData;
+        rules?: RoutingRule<
+          TData,
+          TPathParams,
+          TQueryParams,
+          TFragmentParams,
+          TPath,
+          TQuery,
+          TFragment
+        >[];
+        children?: RouteConfig<
+          TData,
+          unknown,
+          unknown,
+          unknown,
+          TPath,
+          TQuery,
+          TFragment
+        >[];
+      }
+    ): RouteConfig<
+      TData,
+      TPathParams,
+      TQueryParams,
+      TFragmentParams,
+      TPath,
+      TQuery,
+      TFragment
+    > {
+      return {
+        data,
+        route,
+        rules,
+        children,
       };
     },
     createPlace(

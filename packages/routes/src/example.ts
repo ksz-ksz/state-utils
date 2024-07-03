@@ -13,6 +13,7 @@ const routing = createRouting({
   pathEncoder: createPathEncoder(),
   queryEncoder: createQueryEncoder(),
   fragmentEncoder: createFragmentEncoder(),
+  defaultData: {},
   defaultPlace: {
     path: [],
     query: {},
@@ -120,6 +121,15 @@ routing.createPlace(entityDetailsRoute, {
     queryParamBase: '',
     baz: 'asd',
   },
+});
+
+routing.createRouteConfig(rootRoute, {
+  rules: [],
+  children: [
+    routing.createRouteConfig(entityRoute, {
+      children: [routing.createRouteConfig(entityDetailsRoute, {})],
+    }),
+  ],
 });
 
 // type InferPath<T> = T extends Route<infer U, any, any> ? U : never;
