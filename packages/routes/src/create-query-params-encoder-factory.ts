@@ -71,10 +71,12 @@ class QueryParamsEncoder<TParams, TParentParams>
     }
   }
 
-  decode(value: Query): ParamsEncoderResult<Partial<TParentParams & TParams>> {
+  decode(
+    value: Query,
+    parentResult = this.parent?.decode(value)
+  ): ParamsEncoderResult<Partial<TParentParams & TParams>> {
     const params: any = this.decodeQuery(value);
-    if (this.parent !== undefined) {
-      const parentResult = this.parent.decode(value);
+    if (parentResult !== undefined) {
       return {
         partiallyValid: true,
         valid: true,

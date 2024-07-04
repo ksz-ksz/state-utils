@@ -146,9 +146,11 @@ class PathParamsEncoder<TParams, TParentParams>
     }
   }
 
-  decode(value: Path): PathEncoderResult<TParentParams & TParams> {
-    if (this.parent !== undefined) {
-      const parentResult = this.parent.decode(value);
+  decode(
+    value: Path,
+    parentResult = this.parent?.decode(value)
+  ): PathEncoderResult<TParentParams & TParams> {
+    if (parentResult !== undefined) {
       if (parentResult.valid) {
         // parent consumed all the segments
         if (this.path.length === 0) {
