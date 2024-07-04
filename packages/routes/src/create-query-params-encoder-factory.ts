@@ -76,18 +76,18 @@ class QueryParamsEncoder<TParams, TParentParams>
     if (this.parent !== undefined) {
       const parentResult = this.parent.decode(value);
       return {
+        partiallyValid: true,
         valid: true,
         value: {
           ...parentResult.value,
           ...params,
         },
-        parent: parentResult,
       };
     } else {
       return {
+        partiallyValid: true,
         valid: true,
         value: params,
-        parent: undefined,
       };
     }
   }

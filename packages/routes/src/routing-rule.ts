@@ -3,6 +3,38 @@ import { RouteObject } from './route-object';
 import { Place } from './place';
 import { Observable } from 'rxjs';
 
+export interface RoutingRuleContext<
+  TData,
+  TPathParams,
+  TQueryParams,
+  TFragmentParams,
+  TPath = unknown,
+  TQuery = unknown,
+  TFragment = unknown,
+> {
+  routeConfig: RouteConfig<
+    TData,
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
+    TQuery,
+    TFragment
+  >;
+  routeConfigs: RouteConfig<
+    TData,
+    unknown,
+    unknown,
+    unknown,
+    TPath,
+    TQuery,
+    TFragment
+  >[];
+  routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>;
+  routeObjects: RouteObject<unknown, unknown, unknown>[];
+  place: Place<TPath, TQuery, TFragment>;
+}
+
 export interface RoutingRule<
   TData,
   TPathParams,
@@ -13,7 +45,7 @@ export interface RoutingRule<
   TFragment = unknown,
 > {
   onBeforeRouteEnter?(
-    routeConfig: RouteConfig<
+    context: RoutingRuleContext<
       TData,
       TPathParams,
       TQueryParams,
@@ -21,13 +53,10 @@ export interface RoutingRule<
       TPath,
       TQuery,
       TFragment
-    >,
-    routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>,
-    routeObjects: RouteObject<unknown, unknown, unknown>[],
-    place: Place<TPath, TQuery, TFragment>
+    >
   ): Observable<Place<TPath, TQuery, TFragment> | boolean> | void;
   onAfterRouteEnter?(
-    routeConfig: RouteConfig<
+    context: RoutingRuleContext<
       TData,
       TPathParams,
       TQueryParams,
@@ -35,13 +64,10 @@ export interface RoutingRule<
       TPath,
       TQuery,
       TFragment
-    >,
-    routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>,
-    routeObjects: RouteObject<unknown, unknown, unknown>[],
-    place: Place<TPath, TQuery, TFragment>
+    >
   ): void;
   onBeforeRouteLeave?(
-    routeConfig: RouteConfig<
+    context: RoutingRuleContext<
       TData,
       TPathParams,
       TQueryParams,
@@ -49,13 +75,10 @@ export interface RoutingRule<
       TPath,
       TQuery,
       TFragment
-    >,
-    routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>,
-    routeObjects: RouteObject<unknown, unknown, unknown>[],
-    place: Place<TPath, TQuery, TFragment>
+    >
   ): Observable<Place<TPath, TQuery, TFragment> | boolean> | void;
   onAfterRouteLeave?(
-    routeConfig: RouteConfig<
+    context: RoutingRuleContext<
       TData,
       TPathParams,
       TQueryParams,
@@ -63,9 +86,6 @@ export interface RoutingRule<
       TPath,
       TQuery,
       TFragment
-    >,
-    routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>,
-    routeObjects: RouteObject<unknown, unknown, unknown>[],
-    place: Place<TPath, TQuery, TFragment>
+    >
   ): void;
 }

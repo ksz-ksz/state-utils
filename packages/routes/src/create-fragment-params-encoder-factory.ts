@@ -32,8 +32,9 @@ class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
         value: undefined,
       } as ValidEncoderResult<TParam>);
     return {
-      ...result,
-      parent: undefined,
+      partiallyValid: true,
+      valid: result.valid,
+      value: result.value as TParam,
     };
   }
 }

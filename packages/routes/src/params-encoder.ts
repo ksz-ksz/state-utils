@@ -1,9 +1,33 @@
 import { Encoder, EncoderResult } from './encoder';
 
-export type ParamsEncoderResult<T> = EncoderResult<T> & {
-  // route: Route<T, unknown, unknown>;
-  parent: ParamsEncoderResult<unknown> | undefined;
-};
+export interface ValidParamsEncoderResult<T> {
+  partiallyValid: true;
+  valid: true;
+  value: T;
+}
+
+export interface PartiallyValidParamsEncoderResult<T> {
+  partiallyValid: true;
+  valid: false;
+  value: T;
+}
+
+export interface InvalidParamsEncoderResult<T> {
+  partiallyValid: false;
+  valid: false;
+  value?: T;
+}
+
+export type ParamsEncoderResult<T> =
+  | ValidParamsEncoderResult<T>
+  | PartiallyValidParamsEncoderResult<T>
+  | InvalidParamsEncoderResult<T>;
+
+// export type ParamsEncoderResult<T> = EncoderResult<T> & {
+//   partiallyValid: boolean;
+//   // route: Route<T, unknown, unknown>;
+//   // parent: ParamsEncoderResult<unknown> | undefined;
+// };
 
 export interface ParamsEncoder<TEncoded, TParams>
   extends Encoder<TEncoded, TParams> {

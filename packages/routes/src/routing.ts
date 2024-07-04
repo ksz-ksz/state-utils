@@ -221,7 +221,7 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
     },
     createPlace(
       route: Route<unknown, unknown, unknown, TPath, TQuery, TFragment>,
-      { path, query, fragment }: any
+      { path, query, fragment }: any = {}
     ): Place<TPath, TQuery, TFragment> {
       const pathResult = route.pathEncoder.encode(path);
       if (!pathResult.valid) {

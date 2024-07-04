@@ -67,19 +67,26 @@ function normalizePath(path: string): string {
 }
 
 function parseNormalizedPath(path: string): Segment[] {
-  return path.split('/').map((segment): Segment => {
+  const segments: Segment[] = [];
+
+  for (const segment of path.split('/')) {
+    if (segment === '') {
+      continue;
+    }
     if (segment.startsWith(':')) {
-      return {
+      segments.push({
         type: 'path-param',
         name: segment.substring(1),
-      };
+      });
     } else {
-      return {
+      segments.push({
         type: 'path',
         name: segment,
-      };
+      });
     }
-  });
+  }
+
+  return segments;
 }
 
 function parsePath(path: string): Segment[] {
@@ -150,51 +157,51 @@ class PathParamsEncoder<TParams, TParentParams>
         } else {
           // there are still segments to match against on this lever, but there's nothing to consume
           return {
+            partiallyValid: false,
             valid: false,
             consumed: -1,
-            parent: parentResult,
           };
         }
-      } else if (parentResult.consumed !== -1) {
+      } else if (parentResult.partiallyValid) {
         // parent did not consume all the segments, but the segments it consumed so far are valid
         const params = this.decodeSegments(value, parentResult.consumed);
         if (params === undefined) {
           return {
+            partiallyValid: false,
             valid: false,
             consumed: -1,
-            parent: parentResult,
           };
         }
 
         const consumed = parentResult.consumed + this.path.length;
         return {
+          partiallyValid: true,
           valid: consumed === value.length,
           consumed,
-          parent: parentResult,
           value: { ...parentResult.value, ...params },
         };
       } else {
         return {
+          partiallyValid: false,
           valid: false,
-          consumed: parentResult.consumed,
-          parent: parentResult,
+          consumed: -1, // fixme: is that ok?
         };
       }
     } else {
       const params = this.decodeSegments(value, 0);
       if (params === undefined) {
         return {
+          partiallyValid: false,
           valid: false,
           consumed: -1,
-          parent: undefined,
         };
       }
 
       const consumed = this.path.length;
       return {
+        partiallyValid: true,
         valid: consumed === value.length,
         consumed,
-        parent: undefined,
         value: params,
       };
     }

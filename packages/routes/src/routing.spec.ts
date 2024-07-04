@@ -14,6 +14,7 @@ function createTestHarness() {
     pathEncoder: createPathEncoder(),
     queryEncoder: createQueryEncoder(),
     fragmentEncoder: createFragmentEncoder(),
+    defaultData: {},
     defaultPlace: {
       path: [],
       query: {},
