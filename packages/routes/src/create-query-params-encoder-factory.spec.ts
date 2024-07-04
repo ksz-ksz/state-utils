@@ -15,7 +15,7 @@ describe('create-query-params-encoder-factory', () => {
 
       expect(result).toMatchInlineSnapshot(`
 {
-  "parent": undefined,
+  "partiallyValid": true,
   "valid": true,
   "value": {
     "foo": "fooVal",
@@ -40,13 +40,7 @@ describe('create-query-params-encoder-factory', () => {
 
       expect(result).toMatchInlineSnapshot(`
 {
-  "parent": {
-    "parent": undefined,
-    "valid": true,
-    "value": {
-      "foo": "fooVal",
-    },
-  },
+  "partiallyValid": true,
   "valid": true,
   "value": {
     "bar": 42,

@@ -14,7 +14,7 @@ describe('create-path-params-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": 2,
-  "parent": undefined,
+  "partiallyValid": true,
   "valid": true,
   "value": {
     "foo": "fooVal",
@@ -38,14 +38,7 @@ describe('create-path-params-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": 4,
-  "parent": {
-    "consumed": 2,
-    "parent": undefined,
-    "valid": false,
-    "value": {
-      "foo": "fooVal",
-    },
-  },
+  "partiallyValid": true,
   "valid": true,
   "value": {
     "bar": 42,
@@ -66,7 +59,7 @@ describe('create-path-params-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": -1,
-  "parent": undefined,
+  "partiallyValid": false,
   "valid": false,
 }
 `);
@@ -85,7 +78,7 @@ describe('create-path-params-encoder-factory', () => {
       expect(result).toMatchInlineSnapshot(`
 {
   "consumed": -1,
-  "parent": undefined,
+  "partiallyValid": false,
   "valid": false,
 }
 `);

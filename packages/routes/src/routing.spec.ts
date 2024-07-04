@@ -73,7 +73,6 @@ describe('routing', () => {
 {
   "fragment": "valid-fragment",
   "path": [
-    "",
     "test",
     "valid-path-param",
   ],
