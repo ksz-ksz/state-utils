@@ -17,6 +17,19 @@ describe('query-encoder', () => {
 }
 `);
     });
+
+    it('should encode empty object', () => {
+      const encoder = createQueryEncoder();
+
+      const result = encoder.encode({});
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": "",
+}
+`);
+    });
   });
 
   describe('decode', () => {
@@ -33,6 +46,61 @@ describe('query-encoder', () => {
   "value": {
     "bar": "<>?,/\`@#$%^&+",
     "foo": "fooVal",
+  },
+}
+`);
+    });
+
+    it('should decode empty string', () => {
+      const encoder = createQueryEncoder();
+
+      const result = encoder.decode('');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {},
+}
+`);
+    });
+
+    it('should decode ?', () => {
+      const encoder = createQueryEncoder();
+
+      const result = encoder.decode('?');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {},
+}
+`);
+    });
+
+    it('should decode param without value', () => {
+      const encoder = createQueryEncoder();
+
+      const result = encoder.decode('?');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {},
+}
+`);
+    });
+
+    it('should decode empty param', () => {
+      const encoder = createQueryEncoder();
+
+      const result = encoder.decode('?foo&&bar');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "valid": true,
+  "value": {
+    "bar": "",
+    "foo": "",
   },
 }
 `);

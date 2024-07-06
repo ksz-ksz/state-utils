@@ -11,6 +11,7 @@ import { params } from './params';
 function createTestHarness() {
   const routing = createRouting({
     historian: createBrowserHistorian(),
+    baseHref: '/base/href/',
     pathEncoder: createPathEncoder(),
     queryEncoder: createQueryEncoder(),
     fragmentEncoder: createFragmentEncoder(),
@@ -103,6 +104,116 @@ describe('routing', () => {
   "query": {},
 }
 `);
+    });
+  });
+
+  describe('parseHref', () => {
+    it('should parse href with relative path', () => {
+      const { routing } = createTestHarness();
+
+      const result = routing.parseHref('foo/bar');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "fragment": "",
+  "path": [
+    "foo",
+    "bar",
+  ],
+  "query": {},
+}
+`);
+    });
+
+    it('should parse href with root-relative path', () => {
+      const { routing } = createTestHarness();
+
+      const result = routing.parseHref('/base/href/foo/bar');
+
+      expect(result).toMatchInlineSnapshot(`
+{
+  "fragment": "",
+  "path": [
+    "foo",
+    "bar",
+  ],
+  "query": {},
+}
+`);
+    });
+  });
+
+  it('should parse href with query', () => {
+    const { routing } = createTestHarness();
+
+    const result = routing.parseHref('foo/bar?a=hi&b=7');
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "fragment": "",
+  "path": [
+    "foo",
+    "bar",
+  ],
+  "query": {
+    "a": "hi",
+    "b": "7",
+  },
+}
+`);
+  });
+
+  it('should parse href with fragment', () => {
+    const { routing } = createTestHarness();
+
+    const result = routing.parseHref('foo/bar#baz');
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "fragment": "baz",
+  "path": [
+    "foo",
+    "bar",
+  ],
+  "query": {},
+}
+`);
+  });
+
+  it('should parse href with path, query, and fragment', () => {
+    const { routing } = createTestHarness();
+
+    const result = routing.parseHref('foo/bar?a=hi&b=7#baz');
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "fragment": "baz",
+  "path": [
+    "foo",
+    "bar",
+  ],
+  "query": {
+    "a": "hi",
+    "b": "7",
+  },
+}
+`);
+  });
+
+  describe('formatHref', () => {
+    it('should format href', () => {
+      const { routing } = createTestHarness();
+
+      const result = routing.formatHref({
+        path: ['foo', 'bar'],
+        query: {
+          a: 'hi',
+          b: '7',
+        },
+        fragment: 'baz',
+      });
+
+      expect(result).toMatchInlineSnapshot(`"/base/href/foo/bar?a=hi&b=7#baz"`);
     });
   });
 });

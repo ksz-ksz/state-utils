@@ -12,6 +12,7 @@ import { createRouteMatcher } from './route-matcher';
 function createTestHarness() {
   const routing = createRouting({
     historian: createBrowserHistorian(),
+    baseHref: '/',
     pathEncoder: createPathEncoder(),
     queryEncoder: createQueryEncoder(),
     fragmentEncoder: createFragmentEncoder(),

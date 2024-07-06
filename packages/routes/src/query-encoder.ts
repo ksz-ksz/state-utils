@@ -22,8 +22,12 @@ class QueryEncoder implements Encoder<string, Query> {
     const queryString = normalizeQueryString(value);
     const entries = queryString.split('&');
     for (const entry of entries) {
+      if (entry === '') {
+        continue;
+      }
       const [paramKey, paramValue] = entry.split('=');
-      query[decodeURIComponent(paramKey)] = decodeURIComponent(paramValue);
+      query[decodeURIComponent(paramKey)] =
+        paramValue !== undefined ? decodeURIComponent(paramValue) : '';
     }
     return {
       valid: true,

@@ -7,9 +7,14 @@ import { RouteConfig } from './route-config';
 import { RoutingRule } from './routing-rule';
 
 export interface Routing<TData, TPath, TQuery, TFragment> {
-  pathEncoder: Encoder<string, TPath>;
-  queryEncoder: Encoder<string, TQuery>;
-  fragmentEncoder: Encoder<string, TFragment>;
+  readonly baseHref: string;
+  readonly pathEncoder: Encoder<string, TPath>;
+  readonly queryEncoder: Encoder<string, TQuery>;
+  readonly fragmentEncoder: Encoder<string, TFragment>;
+
+  parseHref(href: string): Place<TPath, TQuery, TFragment>;
+
+  formatHref(place: Place<TPath, TQuery, TFragment>): string;
 
   createRoute<TPathParams, TQueryParams, TFragmentParams>(options: {
     parent?: never;
@@ -129,8 +134,29 @@ export interface Routing<TData, TPath, TQuery, TFragment> {
   ): Place<TPath, TQuery, TFragment>;
 }
 
+function isPathPrefix(path: string, prefix: string) {
+  if (path === prefix) {
+    return true;
+  } else if (prefix.endsWith('/')) {
+    return path.startsWith(prefix);
+  } else {
+    return path.startsWith(`${prefix}/`);
+  }
+}
+
+function removePathPrefix(path: string, prefix: string) {
+  if (path === prefix) {
+    return '';
+  } else if (prefix.endsWith('/')) {
+    return path.substring(prefix.length);
+  } else {
+    return path.substring(prefix.length + 1);
+  }
+}
+
 export function createRouting<TData, TPath, TQuery, TFragment>(options: {
   historian: Historian;
+  baseHref: string;
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
   fragmentEncoder: Encoder<string, TFragment>;
@@ -140,6 +166,7 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
   let routeId = 0;
 
   const {
+    baseHref,
     pathEncoder,
     queryEncoder,
     fragmentEncoder,
@@ -147,10 +174,66 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
     defaultPlace,
   } = options;
 
+  const baseUrl = new URL(baseHref, 'http://base');
+
   return {
-    pathEncoder: pathEncoder,
-    queryEncoder: queryEncoder,
-    fragmentEncoder: fragmentEncoder,
+    baseHref,
+    pathEncoder,
+    queryEncoder,
+    fragmentEncoder,
+
+    parseHref(href: string): Place<TPath, TQuery, TFragment> {
+      const { pathname, search, hash } = new URL(href, baseUrl);
+
+      if (!isPathPrefix(pathname, baseHref)) {
+        return defaultPlace;
+      }
+
+      const pathnameWithoutBaseHref = removePathPrefix(pathname, baseHref);
+
+      const pathResult = pathEncoder.decode(pathnameWithoutBaseHref);
+      if (!pathResult.valid) {
+        return defaultPlace;
+      }
+      const queryResult = queryEncoder.decode(search);
+      if (!queryResult.valid) {
+        return defaultPlace;
+      }
+      const fragmentResult = fragmentEncoder.decode(hash);
+      if (!fragmentResult.valid) {
+        return defaultPlace;
+      }
+
+      return {
+        path: pathResult.value,
+        query: queryResult.value,
+        fragment: fragmentResult.value,
+      };
+    },
+
+    formatHref(place: Place<TPath, TQuery, TFragment>): string {
+      const pathResult = pathEncoder.encode(place.path);
+      if (!pathResult.valid) {
+        return '';
+      }
+
+      const queryResult = queryEncoder.encode(place.query);
+      if (!queryResult.valid) {
+        return '';
+      }
+
+      const fragmentResult = fragmentEncoder.encode(place.fragment);
+      if (!fragmentResult.valid) {
+        return '';
+      }
+
+      const pathname = new URL(pathResult.value, baseUrl).pathname;
+      const search = queryResult.value;
+      const hash = fragmentResult.value;
+
+      return `${pathname}${search}${hash}`;
+    },
+
     createRoute({ parent, path, query, fragment }: any) {
       return {
         id: routeId++,
