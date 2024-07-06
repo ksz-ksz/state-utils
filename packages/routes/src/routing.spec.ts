@@ -1,5 +1,4 @@
 import { createRouting } from './routing';
-import { createBrowserHistorian } from './browser-historian';
 import { createPathEncoder } from './path-encoder';
 import { createQueryEncoder } from './query-encoder';
 import { createFragmentEncoder } from './fragment-encoder';
@@ -10,7 +9,6 @@ import { params } from './params';
 
 function createTestHarness() {
   const routing = createRouting({
-    historian: createBrowserHistorian(),
     baseHref: '/base/href/',
     pathEncoder: createPathEncoder(),
     queryEncoder: createQueryEncoder(),

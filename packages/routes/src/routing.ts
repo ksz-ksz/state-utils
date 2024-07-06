@@ -1,6 +1,5 @@
 import { Encoder } from './encoder';
 import { Route } from './route';
-import { Historian } from './historian';
 import { ParamsEncoder, ParamsEncoderFactory } from './params-encoder';
 import { Place } from './place';
 import { RouteConfig } from './route-config';
@@ -155,7 +154,6 @@ function removePathPrefix(path: string, prefix: string) {
 }
 
 export function createRouting<TData, TPath, TQuery, TFragment>(options: {
-  historian: Historian;
   baseHref: string;
   pathEncoder: Encoder<string, TPath>;
   queryEncoder: Encoder<string, TQuery>;
