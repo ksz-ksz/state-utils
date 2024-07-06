@@ -7,7 +7,13 @@
   },
   "references": [
     {
+      "path": "../routes/tsconfig.lib.json"
+    },
+    {
       "path": "../selectors/tsconfig.lib.json"
+    },
+    {
+      "path": "../stores/tsconfig.lib.json"
     },
     {
       "path": "../actions/tsconfig.lib.json"
