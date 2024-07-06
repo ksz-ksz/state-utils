@@ -4,10 +4,22 @@
       "path": "./packages/actions/tsconfig.lib.json"
     },
     {
+      "path": "./packages/apps/tsconfig.lib.json"
+    },
+    {
       "path": "./packages/containers/tsconfig.lib.json"
     },
     {
       "path": "./packages/effects/tsconfig.lib.json"
+    },
+    {
+      "path": "./packages/resources/tsconfig.lib.json"
+    },
+    {
+      "path": "./packages/routers/tsconfig.lib.json"
+    },
+    {
+      "path": "./packages/routes/tsconfig.lib.json"
     },
     {
       "path": "./packages/selectors/tsconfig.lib.json"
