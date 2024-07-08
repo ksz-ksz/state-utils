@@ -1,8 +1,4 @@
-import {
-  ActionType,
-  CreateActionsOptions,
-  createActionTypes,
-} from '@state-utils/actions';
+import { ActionType, createActionTypes } from '@state-utils/actions';
 
 export type StoreCommands<TPayloads> = {
   [K in keyof TPayloads as `${K & string}Command`]: ActionType<TPayloads[K]>;

@@ -3,7 +3,11 @@ import { createActionTypes } from './action';
 describe('actions', () => {
   it('should create action with correct namespace, name, and payload', () => {
     // given
-    const actions = createActionTypes<{ myAction: { prop: string } }>({
+    const actions = createActionTypes<{
+      myAction: {
+        payload: { prop: string };
+      };
+    }>({
       namespace: 'myActions',
     });
 

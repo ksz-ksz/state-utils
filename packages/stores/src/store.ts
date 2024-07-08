@@ -59,7 +59,7 @@ export function createStore<TState, TPayloads>(
 
   const subscription = new Subscription();
   for (const [transitionName, transition] of transitionEntries) {
-    const commandType: ActionType<any> =
+    const commandType: ActionType =
       // @ts-expect-error ignore no index signature
       actions[getCommandName(transitionName)];
     const beforeEventType: ActionType<StoreBeforeTransitionEvent<TState, any>> =
@@ -68,7 +68,8 @@ export function createStore<TState, TPayloads>(
     const afterEventType: ActionType<StoreAfterTransitionEvent<TState, any>> =
       // @ts-expect-error ignore no index signature
       actions[getAfterEventName(transitionName)];
-    const commands: ActionSource<any> = actionSources.ofType(commandType);
+    const commands: ActionSource<unknown, unknown> =
+      actionSources.ofType(commandType);
     subscription.add(
       commands.subscribe({
         next({ payload }) {

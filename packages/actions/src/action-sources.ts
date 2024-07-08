@@ -1,40 +1,43 @@
 import { ActionSource } from './action-source';
 import { Action, ActionType } from './action';
-
-export interface ActionsSelector<T> {
-  select(actions: ActionSources): T;
-}
+import { Observable } from 'rxjs';
 
 export interface ActionSources {
-  dispatch(action: Action<any>): void;
-  select<T>(selector: ActionsSelector<T>): T;
-  ofType<T>(factory: ActionType<T>): ActionSource<T>;
+  dispatch<TPayload, TReturnPayload>(
+    action: Action<TPayload, TReturnPayload>
+  ): Observable<TReturnPayload>[];
+  ofType<TPayload, TReturnPayload>(
+    type: ActionType<TPayload, TReturnPayload>
+  ): ActionSource<TPayload, TReturnPayload>;
 }
 
 export function createActionSources(): ActionSources {
-  const sources = new Map<string, WeakRef<ActionSource<any>>>();
+  const sources = new Map<string, WeakRef<ActionSource<unknown, unknown>>>();
 
-  function getSource<T>(
+  function getSource<TPayload, TReturnPayload>(
     namespace: string,
     name: string,
     create?: true
-  ): ActionSource<T>;
-  function getSource<T>(
+  ): ActionSource<TPayload, TReturnPayload>;
+  function getSource<TPayload, TReturnPayload>(
     namespace: string,
     name: string,
     create: false
-  ): ActionSource<T> | undefined;
-  function getSource<T>(
+  ): ActionSource<TPayload, TReturnPayload> | undefined;
+  function getSource<TPayload, TReturnPayload>(
     namespace: string,
     name: string,
     create = true
-  ): ActionSource<T> | undefined {
+  ): ActionSource<TPayload, TReturnPayload> | undefined {
     const actionKey = `${namespace}::${name}`;
     const source = sources.get(actionKey)?.deref();
     if (source !== undefined) {
-      return source;
+      return source as ActionSource<TPayload, TReturnPayload>;
     } else if (create) {
-      const source = new ActionSource<any>(namespace, name);
+      const source = new ActionSource<TPayload, TReturnPayload>(
+        namespace,
+        name
+      );
       sources.set(actionKey, new WeakRef(source));
       return source;
     } else {
@@ -43,21 +46,16 @@ export function createActionSources(): ActionSources {
   }
 
   return {
-    dispatch(action: Action<any>) {
+    dispatch<TPayload, TReturnPayload>(
+      action: Action<TPayload, TReturnPayload>
+    ): Observable<TReturnPayload>[] {
       const source = getSource(action.namespace, action.name, false);
-      console.log(
-        `DISPATCH${source === undefined ? '?' : '!'}`,
-        action.namespace,
-        action.name,
-        action.payload
-      );
-      source?.dispatchAction(action);
+      return (source?.dispatch(action) as Observable<TReturnPayload>[]) ?? [];
     },
-    select<T>(selector: ActionsSelector<T>): T {
-      return selector.select(this);
-    },
-    ofType<T>(factory: ActionType<T>): ActionSource<T> {
-      return getSource(factory.namespace, factory.name);
+    ofType<TPayload, TReturnPayload>(
+      type: ActionType<TPayload, TReturnPayload>
+    ): ActionSource<TPayload, TReturnPayload> {
+      return getSource(type.namespace, type.name);
     },
   };
 }
