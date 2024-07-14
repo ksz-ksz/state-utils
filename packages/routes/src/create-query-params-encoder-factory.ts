@@ -1,15 +1,16 @@
-import { Encoders } from './encoders';
 import { Query } from './query';
 import { Encoder, EncoderResult } from './encoder';
 import {
-  ParamsEncoder,
-  ParamsEncoderFactory,
-  ParamsEncoderResult,
-} from './params-encoder';
+  RouteParamsEncoder,
+  RouteParamsEncoderFactory,
+  RouteParamsEncoderResult,
+} from './route-params-encoder';
+import { ParamsEncoder } from './params-encoder';
+import { ParamsEncoders } from './params-encoders';
 
 export function createQuery<TParams, TParentParams>(
-  params?: Encoders<TParams>
-): ParamsEncoderFactory<
+  params?: ParamsEncoders<TParams>
+): RouteParamsEncoderFactory<
   Query,
   Partial<TParentParams & TParams>,
   TParentParams
@@ -26,8 +27,8 @@ export function createQueryParamsEncoderFactory<
   TParams,
   TParentParams,
 >(options?: {
-  params?: Encoders<TParams>;
-}): ParamsEncoderFactory<
+  params?: ParamsEncoders<TParams>;
+}): RouteParamsEncoderFactory<
   Query,
   Partial<TParentParams & TParams>,
   TParentParams
@@ -43,11 +44,13 @@ export function createQueryParamsEncoderFactory<
 export const query = createQueryParamsEncoderFactory;
 
 class QueryParamsEncoder<TParams, TParentParams>
-  implements ParamsEncoder<Query, Partial<TParentParams & TParams>>
+  implements RouteParamsEncoder<Query, Partial<TParentParams & TParams>>
 {
   constructor(
-    private readonly parent: ParamsEncoder<Query, TParentParams> | undefined,
-    private readonly params: Encoders<TParams> = {} as Encoders<TParams>
+    private readonly parent:
+      | RouteParamsEncoder<Query, TParentParams>
+      | undefined,
+    private readonly params: ParamsEncoders<TParams> = {} as ParamsEncoders<TParams>
   ) {}
 
   encode(value: Partial<TParentParams & TParams>): EncoderResult<Query> {
@@ -74,7 +77,7 @@ class QueryParamsEncoder<TParams, TParentParams>
   decode(
     value: Query,
     parentResult = this.parent?.decode(value)
-  ): ParamsEncoderResult<Partial<TParentParams & TParams>> {
+  ): RouteParamsEncoderResult<Partial<TParentParams & TParams>> {
     const params: any = this.decodeQuery(value);
     if (parentResult !== undefined) {
       return {
@@ -92,6 +95,28 @@ class QueryParamsEncoder<TParams, TParentParams>
         value: params,
       };
     }
+  }
+
+  areParamsEqual(a: any, b: any): boolean {
+    for (const name of new Set(...Object.keys(a), ...Object.keys(b))) {
+      const param = (this.params as any)[name] as ParamsEncoder<
+        string,
+        unknown
+      >;
+
+      if (param === undefined) {
+        return false;
+      }
+
+      const aVal = a[name];
+      const bVal = b[name];
+
+      if (param.areParamsEqual(aVal, bVal) ?? Object.is(aVal, bVal)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private encodeQuery(value: Partial<TParentParams & TParams>) {

@@ -1,7 +1,7 @@
 import { Place } from './place';
 import { RouteObject } from './route-object';
 import { RouteConfig } from './route-config';
-import { ParamsEncoderResult } from './params-encoder';
+import { RouteParamsEncoderResult } from './route-params-encoder';
 
 export interface RouteMatch<TData, Path, TQuery, TFragment> {
   routeConfig: RouteConfig<
@@ -69,9 +69,9 @@ function match<TData, TPath, TQuery, TFragment>(
     TFragment
   >,
   place: Place<TPath, TQuery, TFragment>,
-  parentPathResult?: ParamsEncoderResult<unknown>,
-  parentQueryResult?: ParamsEncoderResult<unknown>,
-  parentFragmentResult?: ParamsEncoderResult<unknown>
+  parentPathResult?: RouteParamsEncoderResult<unknown>,
+  parentQueryResult?: RouteParamsEncoderResult<unknown>,
+  parentFragmentResult?: RouteParamsEncoderResult<unknown>
 ): RouteMatch<TData, TPath, TQuery, TFragment>[] | undefined {
   const { id, pathEncoder, queryEncoder, fragmentEncoder } = routeConfig.route;
   const { path, query, fragment } = place;

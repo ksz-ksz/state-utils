@@ -1,19 +1,24 @@
 import { Fragment } from './fragment';
-import { Encoder, EncoderResult, ValidEncoderResult } from './encoder';
+import { EncoderResult, ValidEncoderResult } from './encoder';
 import {
-  ParamsEncoder,
-  ParamsEncoderFactory,
-  ParamsEncoderResult,
-} from './params-encoder';
+  RouteParamsEncoder,
+  RouteParamsEncoderFactory,
+  RouteParamsEncoderResult,
+} from './route-params-encoder';
+import { ParamsEncoder } from './params-encoder';
 
 export function createFragment<TParam = undefined>(
-  param?: Encoder<string, TParam>
-): ParamsEncoderFactory<Fragment, TParam, unknown> {
+  param?: ParamsEncoder<string, TParam>
+): RouteParamsEncoderFactory<Fragment, TParam, unknown> {
   return () => new FragmentParamsEncoder(param);
 }
 
-class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
-  constructor(private readonly param: Encoder<string, TParam> | undefined) {}
+class FragmentParamsEncoder<TParam>
+  implements RouteParamsEncoder<Fragment, TParam>
+{
+  constructor(
+    private readonly param: ParamsEncoder<string, TParam> | undefined
+  ) {}
 
   encode(value: TParam): EncoderResult<Fragment> {
     return (
@@ -24,7 +29,7 @@ class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
     );
   }
 
-  decode(value: Fragment): ParamsEncoderResult<TParam> {
+  decode(value: Fragment): RouteParamsEncoderResult<TParam> {
     const result =
       this.param?.decode(value ?? '') ??
       ({
@@ -36,5 +41,9 @@ class FragmentParamsEncoder<TParam> implements ParamsEncoder<Fragment, TParam> {
       valid: result.valid,
       value: result.value as TParam,
     };
+  }
+
+  areParamsEqual(a: TParam, b: TParam): boolean {
+    return this.param?.areParamsEqual(a, b) ?? Object.is(a, b);
   }
 }

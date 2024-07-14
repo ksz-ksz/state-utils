@@ -1,11 +1,12 @@
 import { Path } from './path';
-import { Encoders } from './encoders';
 import { Encoder, EncoderResult } from './encoder';
 import {
-  ParamsEncoder,
-  ParamsEncoderFactory,
-  ParamsEncoderResult,
-} from './params-encoder';
+  RouteParamsEncoder,
+  RouteParamsEncoderFactory,
+  RouteParamsEncoderResult,
+} from './route-params-encoder';
+import { ParamsEncoders } from './params-encoders';
+import { ParamsEncoder } from './params-encoder';
 
 type InferPathSegments<TPath extends string> = TPath extends ''
   ? never
@@ -33,9 +34,9 @@ export function createPath<
   TParentParams,
 >(
   ...[path, params]: TParams extends Record<string, never>
-    ? [path: TPath, params?: Encoders<TParams>]
-    : [path: TPath, params: Encoders<TParams>]
-): ParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
+    ? [path: TPath, params?: ParamsEncoders<TParams>]
+    : [path: TPath, params: ParamsEncoders<TParams>]
+): RouteParamsEncoderFactory<Path, TParentParams & TParams, TParentParams> {
   return (parent) => {
     if (parent !== undefined && !(parent instanceof PathParamsEncoder)) {
       throw new Error('Parent must be an instance of PathParamsEncoder');
@@ -93,7 +94,7 @@ function parsePath(path: string): Segment[] {
   return parseNormalizedPath(normalizePath(path));
 }
 
-type PathEncoderResult<T> = ParamsEncoderResult<T> & {
+type PathEncoderResult<T> = RouteParamsEncoderResult<T> & {
   /**
    * - positive integer - a number of successfully consumed path segments
    * - -1 - means that the Path cannot be decoded
@@ -102,14 +103,14 @@ type PathEncoderResult<T> = ParamsEncoderResult<T> & {
 };
 
 class PathParamsEncoder<TParams, TParentParams>
-  implements ParamsEncoder<Path, TParentParams & TParams>
+  implements RouteParamsEncoder<Path, TParentParams & TParams>
 {
   constructor(
     private readonly parent:
       | PathParamsEncoder<TParentParams, unknown>
       | undefined,
     private readonly path: Segment[],
-    private readonly params: Encoders<TParams> = {} as Encoders<TParams>
+    private readonly params: ParamsEncoders<TParams> = {} as ParamsEncoders<TParams>
   ) {}
 
   encode(value: TParentParams & TParams): EncoderResult<Path> {
@@ -207,6 +208,28 @@ class PathParamsEncoder<TParams, TParentParams>
         value: params,
       };
     }
+  }
+
+  areParamsEqual(a: any, b: any): boolean {
+    for (const name of new Set(...Object.keys(a), ...Object.keys(b))) {
+      const param = (this.params as any)[name] as ParamsEncoder<
+        string,
+        unknown
+      >;
+
+      if (param === undefined) {
+        return false;
+      }
+
+      const aVal = a[name];
+      const bVal = b[name];
+
+      if (param.areParamsEqual(aVal, bVal) ?? Object.is(aVal, bVal)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private decodeSegments(segments: string[], consumed: number) {

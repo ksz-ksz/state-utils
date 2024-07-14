@@ -1,6 +1,9 @@
 import { Encoder } from './encoder';
 import { Route } from './route';
-import { ParamsEncoder, ParamsEncoderFactory } from './params-encoder';
+import {
+  RouteParamsEncoder,
+  RouteParamsEncoderFactory,
+} from './route-params-encoder';
 import { Place } from './place';
 import { RouteConfig } from './route-config';
 import { RoutingRule } from './routing-rule';
@@ -46,9 +49,9 @@ export interface Routing<TData, TPath, TQuery, TFragment> {
 
   createRoute<TPathParams, TQueryParams, TFragmentParams>(options: {
     parent?: never;
-    path: ParamsEncoderFactory<TPath, TPathParams, unknown>;
-    query: ParamsEncoderFactory<TQuery, TQueryParams, unknown>;
-    fragment: ParamsEncoderFactory<TFragment, TFragmentParams, unknown>;
+    path: RouteParamsEncoderFactory<TPath, TPathParams, unknown>;
+    query: RouteParamsEncoderFactory<TQuery, TQueryParams, unknown>;
+    fragment: RouteParamsEncoderFactory<TFragment, TFragmentParams, unknown>;
   }): Route<
     TPathParams,
     TQueryParams,
@@ -73,9 +76,9 @@ export interface Routing<TData, TPath, TQuery, TFragment> {
       TQuery,
       TFragment
     >;
-    path?: ParamsEncoderFactory<TPath, TPathParams, TParentPathParams>;
-    query?: ParamsEncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
-    fragment?: ParamsEncoderFactory<
+    path?: RouteParamsEncoderFactory<TPath, TPathParams, TParentPathParams>;
+    query?: RouteParamsEncoderFactory<TQuery, TQueryParams, TParentQueryParams>;
+    fragment?: RouteParamsEncoderFactory<
       TFragment,
       TFragmentParams,
       TParentFragmentParams
@@ -275,15 +278,15 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
           parent,
           pathEncoder: getParamsEncoder(
             path,
-            parent?.pathEncoder as ParamsEncoder<TPath, any>
+            parent?.pathEncoder as RouteParamsEncoder<TPath, any>
           ),
           queryEncoder: getParamsEncoder(
             query,
-            parent?.queryEncoder as ParamsEncoder<TQuery, any>
+            parent?.queryEncoder as RouteParamsEncoder<TQuery, any>
           ),
           fragmentEncoder: getParamsEncoder(
             fragment,
-            parent?.fragmentEncoder as ParamsEncoder<TFragment, any>
+            parent?.fragmentEncoder as RouteParamsEncoder<TFragment, any>
           ),
         };
 
@@ -427,8 +430,8 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
 }
 
 function getParamsEncoder<TEncoded, TParams>(
-  encoderFactory?: ParamsEncoderFactory<TEncoded, TParams, any>,
-  parentEncoder?: ParamsEncoder<TEncoded, any>
+  encoderFactory?: RouteParamsEncoderFactory<TEncoded, TParams, any>,
+  parentEncoder?: RouteParamsEncoder<TEncoded, any>
 ) {
   if (encoderFactory !== undefined) {
     return encoderFactory(parentEncoder);

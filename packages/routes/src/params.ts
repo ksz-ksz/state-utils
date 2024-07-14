@@ -1,4 +1,5 @@
-import { Encoder, EncoderResult } from './encoder';
+import { EncoderResult } from './encoder';
+import { ParamsEncoder } from './params-encoder';
 
 export interface StringParamOptions {
   pattern?: RegExp;
@@ -18,9 +19,9 @@ export interface BooleanParamOptions {
 }
 
 export const params: {
-  string(options?: StringParamOptions): Encoder<string, string>;
-  number(options?: NumberParamOptions): Encoder<string, number>;
-  boolean(options?: BooleanParamOptions): Encoder<string, boolean>;
+  string(options?: StringParamOptions): ParamsEncoder<string, string>;
+  number(options?: NumberParamOptions): ParamsEncoder<string, number>;
+  boolean(options?: BooleanParamOptions): ParamsEncoder<string, boolean>;
 } = {
   string(options = {}) {
     return new StringParamEncoder(options);
@@ -33,7 +34,7 @@ export const params: {
   },
 };
 
-class StringParamEncoder implements Encoder<string, string> {
+class StringParamEncoder implements ParamsEncoder<string, string> {
   constructor(private readonly options: StringParamOptions) {}
 
   encode(value: string): EncoderResult<string> {
@@ -62,6 +63,10 @@ class StringParamEncoder implements Encoder<string, string> {
     }
   }
 
+  areParamsEqual(a: string, b: string): boolean {
+    return Object.is(a, b);
+  }
+
   private isValid(value: string) {
     if (typeof value !== 'string') {
       return false;
@@ -81,7 +86,7 @@ class StringParamEncoder implements Encoder<string, string> {
   }
 }
 
-class NumberParamEncoder implements Encoder<string, number> {
+class NumberParamEncoder implements ParamsEncoder<string, number> {
   constructor(private readonly options: NumberParamOptions) {}
 
   decode(value: string): EncoderResult<number> {
@@ -111,6 +116,10 @@ class NumberParamEncoder implements Encoder<string, number> {
     }
   }
 
+  areParamsEqual(a: number, b: number): boolean {
+    return Object.is(a, b);
+  }
+
   private isValid(value: number) {
     if (typeof value !== 'number') {
       return false;
@@ -134,7 +143,7 @@ class NumberParamEncoder implements Encoder<string, number> {
   }
 }
 
-class BooleanParamEncoder implements Encoder<string, boolean> {
+class BooleanParamEncoder implements ParamsEncoder<string, boolean> {
   constructor(private readonly options: BooleanParamOptions) {}
 
   decode(value: string): EncoderResult<boolean> {
@@ -162,6 +171,10 @@ class BooleanParamEncoder implements Encoder<string, boolean> {
       valid: true,
       value: decodedValue,
     };
+  }
+
+  areParamsEqual(a: boolean, b: boolean): boolean {
+    return Object.is(a, b);
   }
 
   private parse(value: string) {
