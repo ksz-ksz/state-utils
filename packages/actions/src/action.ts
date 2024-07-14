@@ -1,41 +1,48 @@
-declare const returnPayload: unique symbol;
-
-export interface ActionType<TPayload = unknown, TReturnPayload = unknown> {
+export interface ActionType<TPayload = unknown> {
   namespace: string;
   name: string;
-  (payload: TPayload): Action<TPayload, TReturnPayload>;
-  is(action: Action): action is Action<TPayload, TReturnPayload>;
+  (payload: TPayload): Action<TPayload>;
+  is(action: Action): action is Action<TPayload>;
 }
 
-export interface Action<TPayload = unknown, TReturnPayload = unknown> {
-  [returnPayload]?: TReturnPayload;
+export interface Action<TPayload = unknown> {
   namespace: string;
   name: string;
   payload: TPayload;
 }
 
-export type ActionTypes<TActionTypes extends ActionTypeDefs> = {
-  [K in keyof TActionTypes]: ActionType<
-    TActionTypes[K]['payload'],
-    TActionTypes[K]['returnPayload']
+export interface CreateActionsOptions {
+  namespace: string;
+  createName?(name: string): string;
+}
+
+export type ActionTypes<TActionPayloads> = {
+  [TActionName in keyof TActionPayloads]: ActionType<
+    TActionPayloads[TActionName]
   >;
 };
 
-interface ActionTypeDef<TPayload = unknown, TReturnPayload = unknown> {
-  payload: TPayload;
-  returnPayload?: TReturnPayload;
-}
+export type ExtractActionTypeFnPayload<T> = T extends (
+  payload: infer T
+) => unknown
+  ? T
+  : never;
 
-type ActionTypeDefs = {
-  [key: string]: ActionTypeDef;
+export type ActionTypeFn<TFn extends (payload: any) => any> = TFn & {
+  namespace: string;
+  name: string;
+  is(action: Action): action is Action<ExtractActionTypeFnPayload<TFn>>;
 };
 
-export function createActionTypes<TActionTypes extends ActionTypeDefs>({
+export type ActionTypeFns<TFns extends { [name: string]: ActionTypeFn<any> }> =
+  {
+    [TActionName in keyof TFns]: ActionTypeFn<TFns[TActionName]>;
+  };
+
+export function createActionTypes<TActionPayloads>({
   namespace,
-}: {
-  namespace: string;
-}): ActionTypes<TActionTypes> {
-  // @ts-expect-error unsafe cast
+  createName = (name) => name,
+}: CreateActionsOptions): ActionTypes<TActionPayloads> {
   return new Proxy(
     {},
     {
@@ -43,7 +50,7 @@ export function createActionTypes<TActionTypes extends ActionTypeDefs>({
         target: Record<string, ActionType<unknown>>,
         key: string
       ): ActionType<unknown> {
-        const name = key;
+        const name = createName(key);
         let actionFactory = target[name];
         if (actionFactory === undefined) {
           actionFactory = Object.defineProperties(
@@ -62,5 +69,5 @@ export function createActionTypes<TActionTypes extends ActionTypeDefs>({
         return actionFactory;
       },
     }
-  );
+  ) as ActionTypes<TActionPayloads>;
 }
