@@ -11,6 +11,7 @@ export interface Routing<TData, TPath, TQuery, TFragment> {
   readonly pathEncoder: Encoder<string, TPath>;
   readonly queryEncoder: Encoder<string, TQuery>;
   readonly fragmentEncoder: Encoder<string, TFragment>;
+  readonly defaultPlace: Place<TPath, TQuery, TFragment>;
 
   getRoute<TPathParams, TQueryParams, TFragmentParams>(
     id: number
@@ -212,6 +213,7 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
     pathEncoder,
     queryEncoder,
     fragmentEncoder,
+    defaultPlace,
 
     parseHref(href: string): Place<TPath, TQuery, TFragment> {
       const { pathname, search, hash } = new URL(href, baseUrl);
