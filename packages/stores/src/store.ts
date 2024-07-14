@@ -18,7 +18,7 @@ export type StoreTransitions<TState, TPayloads> = {
 export interface StoreDef<TState, TPayloads> {
   name?: string;
   state: TState;
-  actions: StoreActionTypes<TState, TPayloads>;
+  actionTypes: StoreActionTypes<TState, TPayloads>;
   transitions: StoreTransitions<TState, TPayloads>;
 }
 
@@ -49,7 +49,7 @@ export function createStore<TState, TPayloads>(
   storeDef: StoreDef<TState, TPayloads>,
   storeRef: symbol = Symbol()
 ): Store<TState> {
-  const { state, actions, transitions } = storeDef;
+  const { state, actionTypes, transitions } = storeDef;
 
   const stateSubject = new BehaviorSubject(state);
   const stateObservable = stateSubject.asObservable();
@@ -61,13 +61,13 @@ export function createStore<TState, TPayloads>(
   for (const [transitionName, transition] of transitionEntries) {
     const commandType: ActionType<any> =
       // @ts-expect-error ignore no index signature
-      actions[getCommandName(transitionName)];
+      actionTypes[getCommandName(transitionName)];
     const beforeEventType: ActionType<StoreBeforeTransitionEvent<TState, any>> =
       // @ts-expect-error ignore no index signature
-      actions[getBeforeEventName(transitionName)];
+      actionTypes[getBeforeEventName(transitionName)];
     const afterEventType: ActionType<StoreAfterTransitionEvent<TState, any>> =
       // @ts-expect-error ignore no index signature
-      actions[getAfterEventName(transitionName)];
+      actionTypes[getAfterEventName(transitionName)];
     const commands: ActionSource<any> = actionSources.ofType(commandType);
     subscription.add(
       commands.subscribe({

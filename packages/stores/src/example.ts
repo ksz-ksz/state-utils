@@ -13,7 +13,7 @@ export interface TodosState {
   todos: string[];
 }
 
-const todosStoreActions = createStoreActionTypes<
+const todosStoreActionTypes = createStoreActionTypes<
   TodosState,
   {
     addTodo: { todo: string };
@@ -23,7 +23,7 @@ const todosStoreActions = createStoreActionTypes<
 
 const todosStore = createStore(actionSources, {
   state: { todos: [] },
-  actions: todosStoreActions,
+  actionTypes: todosStoreActionTypes,
   transitions: {
     addTodo: producer((state, payload) => {
       state.todos.push(payload.todo);
@@ -50,7 +50,7 @@ const countStoreActions = createStoreActionTypes<
 
 const countStore = createStore(actionSources, {
   state: { count: 0 },
-  actions: countStoreActions,
+  actionTypes: countStoreActions,
   transitions: {
     inc: producer((state) => {
       state.count++;
@@ -74,7 +74,7 @@ const timeStoreActions = createStoreActionTypes<
 
 const timeStore = createStore(actionSources, {
   state: { time: 0 },
-  actions: timeStoreActions,
+  actionTypes: timeStoreActions,
   transitions: {
     set: producer((state, payload) => {
       state.time = payload.time;
