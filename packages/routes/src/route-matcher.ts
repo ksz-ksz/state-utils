@@ -3,17 +3,25 @@ import { RouteObject } from './route-object';
 import { RouteConfig } from './route-config';
 import { RouteParamsEncoderResult } from './route-params-encoder';
 
-export interface RouteMatch<TData, Path, TQuery, TFragment> {
+export interface RouteMatch<
+  TData,
+  TPath,
+  TQuery,
+  TFragment,
+  TPathParams = unknown,
+  TQueryParams = unknown,
+  TFragmentParams = unknown,
+> {
   routeConfig: RouteConfig<
     TData,
-    unknown,
-    unknown,
-    unknown,
-    Path,
+    TPathParams,
+    TQueryParams,
+    TFragmentParams,
+    TPath,
     TQuery,
     TFragment
   >;
-  routeObject: RouteObject<unknown, unknown, unknown>;
+  routeObject: RouteObject<TPathParams, TQueryParams, TFragmentParams>;
 }
 
 export interface RouteMatcher<TData, TPath, TQuery, TFragment> {

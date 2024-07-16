@@ -18,6 +18,7 @@ export * from './query';
 export * from './query-encoder';
 export * from './route';
 export * from './route-config';
+export * from './route-diff';
 export * from './route-matcher';
 export * from './route-object';
 export * from './routing';
