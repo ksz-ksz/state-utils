@@ -81,7 +81,7 @@ function match<TData, TPath, TQuery, TFragment>(
   parentQueryResult?: RouteParamsEncoderResult<unknown>,
   parentFragmentResult?: RouteParamsEncoderResult<unknown>
 ): RouteMatch<TData, TPath, TQuery, TFragment>[] | undefined {
-  const { id, pathEncoder, queryEncoder, fragmentEncoder } = routeConfig.route;
+  const { pathEncoder, queryEncoder, fragmentEncoder } = routeConfig.route;
   const { path, query, fragment } = place;
   const pathResult = pathEncoder.decode(path, parentPathResult);
 
@@ -105,7 +105,6 @@ function match<TData, TPath, TQuery, TFragment>(
         {
           routeConfig,
           routeObject: {
-            id,
             path: pathResult.value,
             query: queryResult.valid ? queryResult.value : undefined, // fixme: return undefined or default value?
             fragment: fragmentResult.valid ? fragmentResult.value : undefined, // fixme: return undefined or default value?
@@ -121,7 +120,6 @@ function match<TData, TPath, TQuery, TFragment>(
       {
         routeConfig,
         routeObject: {
-          id,
           path: pathResult.value,
           query: queryResult.valid ? queryResult.value : undefined, // fixme: return undefined or default value?
           fragment: fragmentResult.valid ? fragmentResult.value : undefined, // fixme: return undefined or default value?

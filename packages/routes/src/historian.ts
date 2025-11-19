@@ -1,4 +1,6 @@
 export interface Historian {
+  getHref(): string;
+  getState(): unknown;
   push(href: string, state: unknown): void;
   replace(href: string, state: unknown): void;
   go(delta: number): void;

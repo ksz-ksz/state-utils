@@ -7,7 +7,6 @@ import {
 import { Place } from './place';
 import { RouteConfig } from './route-config';
 import { RoutingRule } from './routing-rule';
-import { WeakRefMap } from './weak-ref-map';
 
 export interface Routing<TData, TPath, TQuery, TFragment> {
   readonly baseHref: string;
@@ -15,33 +14,6 @@ export interface Routing<TData, TPath, TQuery, TFragment> {
   readonly queryEncoder: Encoder<string, TQuery>;
   readonly fragmentEncoder: Encoder<string, TFragment>;
   readonly defaultPlace: Place<TPath, TQuery, TFragment>;
-
-  getRoute<TPathParams, TQueryParams, TFragmentParams>(
-    id: number
-  ):
-    | Route<
-        TPathParams,
-        TQueryParams,
-        TFragmentParams,
-        TPath,
-        TQuery,
-        TFragment
-      >
-    | undefined;
-
-  getRouteConfig<TPathParams, TQueryParams, TFragmentParams>(
-    id: number
-  ):
-    | RouteConfig<
-        TData,
-        TPathParams,
-        TQueryParams,
-        TFragmentParams,
-        TPath,
-        TQuery,
-        TFragment
-      >
-    | undefined;
 
   parseHref(href: string): Place<TPath, TQuery, TFragment>;
 
@@ -193,13 +165,6 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
   defaultData: TData;
   defaultPlace: Place<TPath, TQuery, TFragment>;
 }): Routing<TData, TPath, TQuery, TFragment> {
-  let routeId = 0;
-
-  const routeMap = new WeakRefMap<Route<unknown, unknown, unknown>>();
-  const routeConfigMap = new WeakRefMap<
-    RouteConfig<TData, unknown, unknown, unknown>
-  >();
-
   const {
     baseHref,
     pathEncoder,
@@ -271,10 +236,8 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
     },
 
     createRoute({ parent, path, query, fragment }: any) {
-      const id = routeId++;
       const route: Route<unknown, unknown, unknown, TPath, TQuery, TFragment> =
         {
-          id,
           parent,
           pathEncoder: getParamsEncoder(
             path,
@@ -289,8 +252,6 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
             parent?.fragmentEncoder as RouteParamsEncoder<TFragment, any>
           ),
         };
-
-      routeMap.set(id, route);
 
       return route;
     },
@@ -338,24 +299,12 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
       TQuery,
       TFragment
     > {
-      const routeConfig: RouteConfig<
-        TData,
-        TPathParams,
-        TQueryParams,
-        TFragmentParams,
-        TPath,
-        TQuery,
-        TFragment
-      > = {
-        data,
+      return {
         route,
         rules,
         children,
+        data,
       };
-
-      routeConfigMap.set(route.id, routeConfig);
-
-      return routeConfig;
     },
     createPlace(
       route: Route<unknown, unknown, unknown, TPath, TQuery, TFragment>,
@@ -379,52 +328,6 @@ export function createRouting<TData, TPath, TQuery, TFragment>(options: {
         query: queryResult.value,
         fragment: fragmentResult.value,
       };
-    },
-
-    getRoute<TPathParams, TQueryParams, TFragmentParams>(
-      id: number
-    ):
-      | Route<
-          TPathParams,
-          TQueryParams,
-          TFragmentParams,
-          TPath,
-          TQuery,
-          TFragment
-        >
-      | undefined {
-      return routeMap.get(id) as Route<
-        TPathParams,
-        TQueryParams,
-        TFragmentParams,
-        TPath,
-        TQuery,
-        TFragment
-      >;
-    },
-
-    getRouteConfig<TPathParams, TQueryParams, TFragmentParams>(
-      id: number
-    ):
-      | RouteConfig<
-          TData,
-          TPathParams,
-          TQueryParams,
-          TFragmentParams,
-          TPath,
-          TQuery,
-          TFragment
-        >
-      | undefined {
-      return routeConfigMap.get(id) as RouteConfig<
-        TData,
-        TPathParams,
-        TQueryParams,
-        TFragmentParams,
-        TPath,
-        TQuery,
-        TFragment
-      >;
     },
   };
 }

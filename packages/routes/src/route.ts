@@ -8,7 +8,6 @@ export interface Route<
   TQuery = unknown,
   TFragment = unknown,
 > {
-  readonly id: number;
   readonly parent: Route<unknown, unknown, unknown> | undefined;
   readonly pathEncoder: RouteParamsEncoder<TPath, TPathParams>;
   readonly queryEncoder: RouteParamsEncoder<TQuery, TQueryParams>;

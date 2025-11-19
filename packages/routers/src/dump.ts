@@ -48,8 +48,8 @@ import {
   of,
   takeUntil,
 } from 'rxjs';
-import { Historian } from './historian';
-import { createBrowserHistorian } from './browser-historian';
+import { Historian } from '../../routes/src/historian';
+import { createBrowserHistorian } from '../../routes/src/browser-historian';
 
 const actionSources = createActionSources();
 
@@ -213,7 +213,7 @@ function diffRoutes<TData, TPath, TQuery, TFragment>(
     const prevMatch = prevMatches[i];
     const nextMatch = nextMatches[i];
 
-    if (prevMatch?.routeObject.id !== nextMatch?.routeObject.id) {
+    if (prevMatch?.routeConfig !== nextMatch?.routeConfig) {
       diffs.push({
         prevRouteMatch: prevMatch,
         routeMatch: nextMatch,
